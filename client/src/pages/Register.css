@@ -1,65 +1,126 @@
-/* Container to center the form */
 .register-container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width:100vw;
+  display: flex;
+  height: 90vh;
+  font-family: 'Poppins', sans-serif;
+}
 
-  }
-  
-  /* Form styling */
-  .register-form {
-    background-color: white;
-    padding:32px;
-    padding-right:32px;
-    border-radius: 16px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    min-width: 350px;
-    max-width: fit-content;
-  }
-  
-  /* Title */
-  .form-title {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    text-align: center;
-    color: #1a202c;
-  }
-  
-  /* Error message */
-  .error-message {
-    color: red;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  
-  /* Input fields */
-  .input-style {
-    display: block;
-    width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-  
-  /* Submit button */
-  .submit-btn {
-    background-color: #4f46e5;
-    color: white;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .submit-btn:hover {
-    background-color: #4338ca;
-  }
-  
+/* LEFT: Green Background */
+.register-left-green {
+  flex: 1;
+  background: linear-gradient(135deg, #d0f0d6, #a2e2b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #064420;
+}
+
+
+
+.left-content {
+  text-align: center;
+  padding: 40px;
+}
+
+.left-content h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.left-content p {
+  margin-bottom: 20px;
+}
+
+.left-login-btn {
+  background: transparent;
+  color: #064420;
+  border: 2px solid #064420;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.left-login-btn:hover {
+  background: #064420;
+  color: white;
+}
+
+/* RIGHT: Form */
+.register-right-form {
+  flex: 1;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #064420;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 30px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+input[type="email"] {
+  border-radius: 30px !important;
+}
+
+input:focus, select:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Button */
+.gradient-button {
+  background: linear-gradient(to right, #38b000, #2b9348);
+  color: white;
+  padding: 12px;
+  border: none;
+  width: 100%;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.gradient-button:hover {
+  opacity: 0.9;
+}
+
+/* Messages */
+.error-message {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.info-message {
+  color: #28a745;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
+}

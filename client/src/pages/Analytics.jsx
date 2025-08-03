@@ -6,22 +6,58 @@ import {
 
 const Analytics = () => {
   const [branchData, setBranchData] = useState([]);
-  const [semesterData, setSemesterData] = useState([]);
+  
+  const [companyData, setCompanyData] = useState([]);
 
   const [statusFilter, setStatusFilter] = useState('all');
   const [yearFilter, setYearFilter] = useState('');
-  const [monthFilter, setMonthFilter] = useState('');
+  const [yearlyAnalytics, setYearlyAnalytics] = useState([]);
   const [sectionFilter, setSectionFilter] = useState('');
 
   const knownBranches = ["CSE", "CSBS"];
+  const semesterOrder = ["2.1", "2.2", "3.1", "3.2", "4.1", "4.2"];
+  const knownYears = [2023, 2024, 2025, 2026];
 
-  const fetchAnalytics = async () => {
+  const romanToNumber = {
+    'I': 1,
+    'II': 2,
+    'III': 3,
+    'IV': 4,
+    'V': 5
+  };
+
+  const normalizeCompanyData = (data) => {
+    const years = [2023, 2024, 2025, 2026];
+  
+    if (Array.isArray(data)) {
+      const yearMap = {};
+      data.forEach(item => {
+        yearMap[item.year] = item.companyCount;
+      });
+  
+      return years.map(year => ({
+        year: year,
+        companyCount: yearMap[year] || 0
+      }));
+    } else if (data && data.year === 'All Years') {
+      const perYear = Math.floor(data.companyCount / years.length);
+      return years.map(year => ({
+        year: year,
+        companyCount: perYear
+      }));
+    }
+  
+    return years.map(year => ({
+      year: year,
+      companyCount: 0
+    }));
+  };
+  const fetchBranchAndSemesterAnalytics = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/analytics', {
+      const res = await axios.get('http://localhost:8080/api/admin/analytics', {
         params: {
           status: statusFilter,
           year: yearFilter,
-          // month: monthFilter,
           section: sectionFilter
         }
       });
@@ -29,22 +65,39 @@ const Analytics = () => {
       const sortedBranchData = [...res.data.branchData].sort(
         (a, b) => knownBranches.indexOf(a.branch) - knownBranches.indexOf(b.branch)
       );
-
       setBranchData(sortedBranchData);
-      setSemesterData(res.data.semesterData);
+
+
+
     } catch (err) {
-      console.error('Failed to fetch analytics:', err);
+      console.error('Failed to fetch branch/semester analytics:', err);
     }
   };
   
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [statusFilter, yearFilter, monthFilter, sectionFilter]);
+const fetchYearlyAnalytics = async () => {
+  try {
+    const res = await axios.get('http://localhost:8080/api/admin/yearly-analytics', {
+      params: {
+        year: yearFilter
+      }
+    });
+    setYearlyAnalytics(res.data);
+  } catch (err) {
+    console.error('Failed to fetch yearly analytics:', err);
+  }
+};
+
+useEffect(() => {
+  fetchBranchAndSemesterAnalytics();
+ 
+  fetchYearlyAnalytics();  // <-- Added this line
+}, [statusFilter, yearFilter, sectionFilter]);
+
 
   return (
-    <div className="analytics-container " style={{ padding: '1rem' }}>
-      <h2 className="mb-4 text-center ">📊 Internship Analytics</h2>
+    <div className="analytics-container" style={{ padding: '1rem' }}>
+      <h2 className="mb-4 text-center">📊 Internship Analytics</h2>
 
       {/* Filters */}
       <div className="d-flex flex-wrap justify-content-center gap-4 mb-4">
@@ -82,33 +135,38 @@ const Analytics = () => {
         </select>
       </div>
 
+      {/* Branch-wise Chart */}
       <h4 className='text-center mt-5 mb-3'>Branch-wise Internships</h4>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={branchData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <XAxis dataKey="branch" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="count" fill="#6a5acd" barSize={40}>
-              <LabelList dataKey="count" position="top" />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-
-
-      {/* Semester-wise Chart */}
-      <h4 className='text-center mt-5 mb-3'>Semester-wise Internships</h4>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={semesterData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <XAxis dataKey="semester" />
+        <BarChart data={branchData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <XAxis dataKey="branch" />
           <YAxis allowDecimals={false} />
           <Tooltip />
           <Legend />
-          <Bar dataKey="count" fill="#3cb371" barSize={40}>
+          <Bar dataKey="count" fill="#6a5acd" barSize={40}>
             <LabelList dataKey="count" position="top" />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+
+     
+
+      {/* Year-wise Company Visits Chart */}
+      <h4 className='text-center mt-5 mb-3'>Year-wise Students & Company Visits</h4>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={yearlyAnalytics} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <XAxis dataKey="year" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="students" fill="#4caf50" name="Students Placed">
+              <LabelList dataKey="students" position="top" />
+            </Bar>
+            <Bar dataKey="companies" fill="#ff9800" name="Companies Visited">
+              <LabelList dataKey="companies" position="top" />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
 
     </div>
   );

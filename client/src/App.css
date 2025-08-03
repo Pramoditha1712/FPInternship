@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+  * {
+    font-family: 'Poppins', sans-serif !important;
+  }
+    
+  body {
+    @apply bg-gradient-to-r from-blue-600 via-cyan-500 to-green-400 min-h-screen flex items-center justify-center;
+    font-family: 'Poppins', sans-serif;
+  }

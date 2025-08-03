@@ -22,7 +22,7 @@ const Upload = () => {
 
     // Fetch internship details to check end date
     try {
-      const internshipRes = await fetch(`http://localhost:5000/api/admin/roll/${formData.rollNo}`);
+      const internshipRes = await fetch(`http://localhost:8080/api/admin/roll/${formData.rollNo}`);
       if (!internshipRes.ok) {
         alert('Could not find internship details for this roll number.');
         return;
@@ -48,7 +48,7 @@ const Upload = () => {
     console.log('Submitting feedback with data:', formData);
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/feedbacks', {
+      const response = await fetch('http://localhost:8080/api/admin/feedbacks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -1,14 +1,10 @@
 import axios from 'axios';
 
-// 👇 Update the backend port here
-const BASE_URL = 'http://localhost:5000';
-
-// Route-specific base URLs
+const BASE_URL = 'http://localhost:8080';
 const INTERNSHIP_BASE_URL = `${BASE_URL}/api/internships`;
 const ADMIN_BASE_URL = `${BASE_URL}/api/admin`;
 const AUTH_BASE_URL = `${BASE_URL}/auth`;
 
-/* 📊 Admin-related APIs */
 export const getDashboardStats = async () => {
   try {
     const res = await axios.get(`${ADMIN_BASE_URL}/dashboard-stats`);
@@ -18,7 +14,6 @@ export const getDashboardStats = async () => {
   }
 };
 
-/* 🎓 Internship-related APIs */
 export const getAllInternships = async () => {
   try {
     const res = await axios.get(`${ADMIN_BASE_URL}/internships`);
@@ -37,14 +32,11 @@ export const updateInternshipStatus = async (id, status) => {
   }
 };
 
-/* ===========================
-   🔐 Authentication APIs
-=========================== */
 export const registerUser = async (form) => {
   try {
-    const { rollNo, name, email, section,branch, semester, password } = form;
+    const { rollNo, name, email, section, branch, semester, password } = form;
     const res = await axios.post(`${AUTH_BASE_URL}/register`, {
-      rollNo, name, email, section,branch, semester, password
+      rollNo, name, email, section, branch, semester, password
     });
     return res.data;
   } catch (err) {
@@ -54,7 +46,10 @@ export const registerUser = async (form) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const res = await axios.post(`${AUTH_BASE_URL}/login`, credentials);
+    const res = await axios.post(`${AUTH_BASE_URL}/login`, credentials, {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true
+    });
     return res.data;
   } catch (err) {
     throw err;

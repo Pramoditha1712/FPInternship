@@ -1,8 +1,11 @@
 ###
-GET http://localhost:5000/api/admin/login/A1/Sarika@123
+GET http://localhost:8080/api/admin/login/A1/Sarika@123
 
 ###
-GET http://localhost:5000/api/admin/internships
+GET http://localhost:8080/api/admin/internships
 
 ###
-GET http://localhost:5000/api/user/profile
+GET http://localhost:8080/api/user/profile
+
+###
+POST http://localhost:8080/api/admin/login

@@ -1,6 +1,9 @@
+// ==== BACKEND (Express) ==== 
+
+// routes/auth.js
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const JWT_SECRET = 'your_jwt_secret_key'; // Use process.env.JWT_SECRET in production
@@ -28,9 +31,9 @@ router.post('/register', async (req, res) => {
       email,
       branch,
       semester,
-      section, // ✅ Fixed here
+      section,
       password,
-      role: 'student',
+      role: 'student'
     });
 
     await user.save();
@@ -41,7 +44,6 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 
 // ✅ Login Route
 router.post('/login', async (req, res) => {
@@ -59,7 +61,6 @@ router.post('/login', async (req, res) => {
     }
 
     console.log('Comparing input password with hash:', user.password);
-    // Use User model's comparePassword method for consistency
     const isMatch = await user.comparePassword(password);
     console.log('Password match:', isMatch);
 

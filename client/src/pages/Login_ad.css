@@ -1,0 +1,102 @@
+.login-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: none;
+  margin-top: 100px !important;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow:
+    0 0 80px rgba(56, 239, 125, 0.3),   /* Green shadow reduced */
+    0 0 120px rgba(0, 123, 255, 0.3),
+    0 0 150px rgba(56, 239, 125, 0.2);  /* Green shadow reduced */
+  transition: box-shadow 0.5s ease;
+}
+
+.login-card:hover {
+  box-shadow:
+    0 0 100px rgba(56, 239, 125, 0.4),  /* Green shadow reduced */
+    0 0 160px rgba(0, 123, 255, 0.4),
+    0 0 200px rgba(56, 239, 125, 0.3);  /* Green shadow reduced */
+}
+
+/* Glow Pulse Animation (reduced green) */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 20px rgba(56, 239, 125, 0.3), 0 0 40px rgba(0, 123, 255, 0.25);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 40px rgba(56, 239, 125, 0.4), 0 0 70px rgba(0, 123, 255, 0.35);
+    transform: scale(1.02);
+  }
+}
+
+.gradient-button {
+  background: linear-gradient(to right, #11998e, #38ef7d);
+  color: white;
+  border: none;
+  padding: 12px 0;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.gradient-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* New Input Group Styling */
+.input-with-icon {
+  display: flex;
+  align-items: center;
+  background: #f0fdf4; /* Light green shade */
+  border: 2px solid #d1fae5;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-with-icon:focus-within {
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.input-icon {
+  color: #10b981;
+  font-size: 1.2rem;
+  margin-right: 0.75rem;
+}
+
+.input-with-icon input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.input-with-icon input::placeholder {
+  color: #9ca3af;
+}
+
+/* Blob Layer */
+.blob-layer {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.2) 0%, transparent 40%),
+              radial-gradient(circle at 80% 70%, rgba(255,255,255,0.15) 0%, transparent 40%);
+  filter: blur(100px);
+  animation: blobWave 10s ease-in-out infinite alternate;
+}
+
+@keyframes blobWave {
+  0% { transform: scale(1) translate(0,0); }
+  100% { transform: scale(1.05) translate(20px, 10px); }
+}

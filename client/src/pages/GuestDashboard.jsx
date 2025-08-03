@@ -260,7 +260,7 @@ const GuestDashboard = () => {
   useEffect(() => {
     const fetchGuestDashboard = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/guest/guest-dashboard');
+        const res = await axios.get('http://localhost:8080/guest/guest-dashboard');
         setCategorizedData(res.data.categorized || {});
       } catch (err) {
         console.error(err);

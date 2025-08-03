@@ -2,7 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
+
 const authRoutes = require('./routes/authRoutes');
+
 const internshipRoutes = require('./routes/internshipRoutes');
 const userRoutes = require('./routes/UserRoutes')
 const guestRoutes=require('./routes/guestRoutes')
@@ -10,8 +12,16 @@ const path = require('path');
 const Admin = require('./models/Admin');
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
+app.use((err, req, res, next) => {
+  console.error('Unexpected Error:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 mongoose.connect('mongodb://127.0.0.1:27017/internship', {
   useNewUrlParser: true,
@@ -44,5 +54,5 @@ app.use('/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/guest',guestRoutes)
 
-const PORT = 5000;
+const PORT = 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

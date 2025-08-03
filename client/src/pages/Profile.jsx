@@ -25,7 +25,7 @@ export default function Profile() {
         setLoading(false);
         return;
       }
-      const res = await axios.get('http://localhost:5000/api/user/profile', {
+      const res = await axios.get('http://localhost:8080/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUserProfile(res.data);
@@ -163,7 +163,7 @@ export default function Profile() {
                                     href={
                                       internship.offerLetter.includes("drive.google.com")
                                         ? convertDriveLink(internship.offerLetter)
-                                        : `http://localhost:5000${internship.offerLetter}`
+                                        : `http://localhost:8080${internship.offerLetter}`
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -185,7 +185,7 @@ export default function Profile() {
                                     href={
                                       internship.applicationLetter.includes("drive.google.com")
                                         ? convertDriveLink(internship.applicationLetter)
-                                        : `http://localhost:5000${internship.applicationLetter}`
+                                        : `http://localhost:8080${internship.applicationLetter}`
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -207,7 +207,7 @@ export default function Profile() {
                                     href={
                                       internship.noc.includes("drive.google.com")
                                         ? convertDriveLink(internship.noc)
-                                        : `http://localhost:5000${internship.noc}`
+                                        : `http://localhost:8080${internship.noc}`
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"

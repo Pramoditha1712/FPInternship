@@ -6,7 +6,7 @@ import uuid
 from dateutil import parser
 
 # ✅ Load Excel
-df = pd.read_excel(r"C:\Users\A SARIKA REDDY\Downloads\2025-26 Internship Candidates Details form (Responses) (2).xlsx")
+df = pd.read_excel(r"/Users/pramodithakathari/Desktop/2/2025-26 Internship Candidates Details form (Responses).xlsx")
 df.columns = df.columns.str.strip().str.replace("\n", " ").str.replace("  ", " ", regex=False)
 
 # ✅ Connect to MongoDB

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import Header from '../components/Navbar';
+import './Login_ad.css'
+import feather from 'feather-icons';
 function Login_ad() {
   const [adminID, setAdminID] = useState('');
   const [password, setPassword] = useState('');
@@ -12,65 +15,92 @@ function Login_ad() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(`http://localhost:5000/api/admin/login/${adminID}/${password}`);
+      const response = await axios.post('http://localhost:8080/api/admin/login', {
+        adminID,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
 
-      localStorage.setItem('token', res.data.token);
-      alert('Login successful');
-      navigate('/admin'); // Redirect to admin dashboard
-    } catch (err) {
-      setError('Invalid credentials. Please try again.');
+      console.log(response.data);
+      localStorage.setItem('adminToken', response.data.token);
+      navigate('/admin');
+    } catch (error) {
+      console.error(error);
+      setError('Invalid Credentials');
     }
   };
+  useEffect(() => {
+    feather.replace();
+  }, []);
 
   return (
-    <div>
-    <div className="header d-flex align-items-center p-3 mb-5">
-        <img
-          src="https://media.licdn.com/dms/image/v2/C560BAQFKt8O5GdaFjw/company-logo_200_200/company-logo_200_200/0/1680080095222/vnr_vignanajyothiinstituteofengineeringandtechnology_logo?e=2147483647&v=beta&t=nV3OFiSPyeDZdeZib-pHBlNwN-i1S73KwQljcRw3FvY"
-          alt="VNR Vignana Jyothi Logo"
-          style={{ width: '80px', height: '80px'}}
-        />
-        <h1 className="text-light">VNR Vignana Jyothi Institute of Engineering and Technology</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
+     
+    
+      <Header />
+      <div className="text-center mb-4" style={{textShadow: '0 2px 5px rgba(0,0,0,0.3)' }}>
+          <h2 style={{ fontWeight: '700',marginTop:'4rem' }}>“Empowering Administrators with Precision.”</h2>
+          <p style={{ fontSize: '16px', marginTop: '0.5rem' }}>Your secure gateway to control and manage effortlessly.</p>
+        </div>
+      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: 'auto', marginTop: '10 rem' }}>
+        <div className="login-card p-4">
+          <h3>Admin Login</h3>
+          <p style={{"color": "#666", "fontSize": "14px"}}>Enter your credentials to access the admin dashboard</p>
+
+
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+            <div className="mb-3">
+              <label className="form-label">Admin ID</label>
+              <input
+                type="text"
+                className="form-control"
+                value={adminID}
+                onChange={(e) => setAdminID(e.target.value)}
+                required
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #ccc',
+                  boxShadow: 'none'
+                }}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  borderRadius: '12px',
+                  border: '1px solid #ccc',
+                  boxShadow: 'none'
+                }}
+              />
+            </div>
+
+            <button
+                type="submit"
+                className="gradient-button w-100"
+              >
+                Login
+              </button>
+
+          </form>
+        </div>
       </div>
-    <div className="container d-flex justify-content-center align-items-center">
-      <div className="card p-4 shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
-        
-        <h3 className="text-center mb-4">Admin Login</h3>
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label className="form-label">Admin ID</label>
-            <input
-              type="text"
-              className="form-control"
-              value={adminID}
-              onChange={(e) => setAdminID(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary w-100">
-            Login
-          </button>
-        </form>
-      </div>
-    </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Navbar'
 
 const Upload = () => {
   const navigate = useNavigate();
@@ -84,17 +85,11 @@ const Upload = () => {
   };
 
   return (
-    
+    <div>
+    <Header/>
     <div className="container mt-5">
-      <div className="header d-flex align-items-center p-3 mb-4">
-        <img
-          src="https://media.licdn.com/dms/image/v2/C560BAQFKt8O5GdaFjw/company-logo_200_200/company-logo_200_200/0/1680080095222/vnr_vignanajyothiinstituteofengineeringandtechnology_logo?e=2147483647&v=beta&t=nV3OFiSPyeDZdeZib-pHBlNwN-i1S73KwQljcRw3FvY"
-          alt="VNR Vignana Jyothi Logo"
-          style={{ width: '80px', height: '80px', marginRight: '15px' }}
-        />
-        <h1 className="mb-0">VNR Vignana Jyothi Institute of Engineering and Technology</h1>
-      </div>
-      <h2 className="text-center mb-4">Submit Feedback</h2>
+      
+      <h2 className="text-center mb-4 mt-4">Submit Feedback</h2>
       <form onSubmit={handleSubmit} className="border p-4 shadow rounded bg-light">
         <div className="mb-3">
           <label className="form-label">Roll Number</label>
@@ -190,6 +185,7 @@ const Upload = () => {
 </div>
 
       </form>
+    </div>
     </div>
   );
 };

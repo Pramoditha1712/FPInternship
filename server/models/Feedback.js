@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const FeedbackSchema = new mongoose.Schema({
   feedbackID: String,
+  internshipID: { type: mongoose.Schema.Types.ObjectId, ref: 'internship' },
   skillsLearned: String,
   technicalSkill: Number,
   communicationSkill: Number,

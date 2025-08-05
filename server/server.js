@@ -4,11 +4,8 @@ const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
 const cron = require('node-cron');
 const { sendFeedbackEmailReminders } = require('./utils/reminderEmailService');
-
-
-
+const organizationRoutes = require('./routes/organizationRoutes');
 const authRoutes = require('./routes/authRoutes');
-
 const internshipRoutes = require('./routes/internshipRoutes');
 const userRoutes = require('./routes/UserRoutes')
 const guestRoutes=require('./routes/guestRoutes')
@@ -60,6 +57,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/internships', internshipRoutes);
 app.use('/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/organization', organizationRoutes);
 app.use('/guest',guestRoutes)
 
 const PORT = 8080;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Pages.css";
+import Header from "../components/Navbar";
 
 const Students = () => {
   const [students, setStudents] = useState([]);
@@ -77,7 +78,8 @@ const handleEditSubmit = async () => {
 
   return (
     <div className="page-container">
-      <h2 className="section-title">All Students</h2>
+      <Header/>
+     <div className="mb-5"></div>
 
       <div className="mb-4 d-flex flex-wrap align-items-center">
         <select

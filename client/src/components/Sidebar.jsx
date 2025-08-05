@@ -18,7 +18,7 @@ const Sidebar = () => {
       </button>
       {isOpen && (
         <div className="sidebar">
-          <h2>VNRVJIET</h2>
+          <h2 className="sidebar-title">VNRVJIET</h2>
           <nav>
           <ul>
             <li className={location.pathname === '/' ? 'active' : ''}><Link to="">Dashboard</Link></li>

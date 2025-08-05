@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/Api';
 import './Register.css';
 import Header from '../components/Navbar'
+import RegisterPic from '../assets/Register.svg'
 export default function Register() {
   const [form, setForm] = useState({
     rollNo: '',
@@ -84,14 +85,15 @@ export default function Register() {
     
       {/* Left Side */}
       <div className="register-left-green">
-        <div className="left-content">
-          <h1>Get Started</h1>
-          <p>Already have an account?</p>
-          <Link to="/student-login">
-            <button className="left-login-btn">Log in</button>
-          </Link>
-        </div>
+      <div className="left-content">
+        <img src={RegisterPic} alt="Sign Up Illustration" className="left-svg" style={{width:"800px"}} />
+        <h1>Get Started</h1>
+        <p>Already have an account?</p>
+        <Link to="/student-login">
+          <button className="left-login-btn">Log in</button>
+        </Link>
       </div>
+    </div>
 
       {/* Right Side */}
       <div className="register-right-form shiftup">

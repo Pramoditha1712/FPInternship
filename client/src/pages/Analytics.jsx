@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Header from '../components/Navbar'
+import './Analytics.css'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LabelList
 } from 'recharts';
@@ -96,44 +98,50 @@ useEffect(() => {
 
 
   return (
-    <div className="analytics-container" style={{ padding: '1rem' }}>
-      <h2 className="mb-4 text-center">📊 Internship Analytics</h2>
+    <div className="analytics-container" >
+      <div className="header-wrapper">
+        <Header />
+      </div>
+      <h2 className="mb-4  text-center">📊 Internship Analytics</h2>
 
       {/* Filters */}
-      <div className="d-flex flex-wrap justify-content-center gap-4 mb-4">
-        <select
-          className="form-select w-auto"
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-        >
-          <option value="">Select Year</option>
-          {[2023, 2024, 2025, 2026].map((year) => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
+      <div className="d-flex gap-3 justify-content-center  flex-wrap mb-3">
+  <select
+    className="form-select"
+    style={{ width: "150px" }}
+    value={yearFilter}
+    onChange={(e) => setYearFilter(e.target.value)}
+  >
+    <option value="">Select Year</option>
+    {[2023, 2024, 2025, 2026].map((year) => (
+      <option key={year} value={year}>{year}</option>
+    ))}
+  </select>
 
-        <select
-          className="form-select w-auto"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="all">All Status</option>
-          <option value="ongoing">Ongoing</option>
-          <option value="past">Past</option>
-          <option value="future">Upcoming</option>
-        </select>
+  <select
+    className="form-select"
+    style={{ width: "150px" }}
+    value={statusFilter}
+    onChange={(e) => setStatusFilter(e.target.value)}
+  >
+    <option value="all">All Status</option>
+    <option value="ongoing">Ongoing</option>
+    <option value="past">Past</option>
+    <option value="future">Upcoming</option>
+  </select>
 
-        <select
-          className="form-select w-auto"
-          value={sectionFilter}
-          onChange={(e) => setSectionFilter(e.target.value)}
-        >
-          <option value="">All Sections</option>
-          {['A', 'B', 'C', 'D'].map((sec) => (
-            <option key={sec} value={sec}>{sec}</option>
-          ))}
-        </select>
-      </div>
+  <select
+    className="form-select"
+    style={{ width: "150px" }}
+    value={sectionFilter}
+    onChange={(e) => setSectionFilter(e.target.value)}
+  >
+    <option value="">All Sections</option>
+    {['A', 'B', 'C', 'D'].map((sec) => (
+      <option key={sec} value={sec}>{sec}</option>
+    ))}
+  </select>
+</div>
 
       {/* Branch-wise Chart */}
       <h4 className='text-center mt-5 mb-3'>Branch-wise Internships</h4>

@@ -1,6 +1,7 @@
 .analytics-container {
-  padding: 1rem;
-  font-family: sans-serif;
+  background-color: white ; /* light green-tinted background */
+  padding: 2rem;
+  min-height: 100vh;  
 }
 
 .analytics-container h2, h3 {
@@ -12,4 +13,9 @@
   padding: 0.5rem;
   margin-left: 0.5rem;
 }
+.header-wrapper {
+  padding-top: 0; /* or 0 */
+ 
+}
+
 

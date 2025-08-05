@@ -1,7 +1,8 @@
 // src/pages/Feedbacks.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-// import './Feedbacks.css';
+import Header from '../components/Navbar'
+import './Feedbacks.css'
 
 const Feedbacks = () => {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -23,7 +24,8 @@ const Feedbacks = () => {
 
   return (
     <div className="feedbacks-page">
-      <h2>Student Feedbacks</h2>
+      <Header/> 
+      <h2 className='mt-3 mb-3 text-center'>Student Feedbacks</h2>
       <table className="feedback-table">
         <thead>
           <tr>

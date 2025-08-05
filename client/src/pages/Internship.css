@@ -1,5 +1,8 @@
 .internship-page {
-  padding-bottom: 3rem;
+  
+  background-color: white ; /* light green-tinted background */
+  padding: 2rem;
+  min-height: 100vh;
 }
 
 .internship-page .card {

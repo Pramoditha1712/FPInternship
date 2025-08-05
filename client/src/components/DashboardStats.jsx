@@ -10,15 +10,11 @@ const DashboardStats = ({ stats }) => {
   ];
 
   return (
-    <div className="row">
+    <div className="stats-grid">
       {statItems.map((item, index) => (
-        <div key={index} className="col-md-3 mb-4">
-          <div className="card text-center shadow-sm">
-            <div className="card-body">
-              <h5 className="card-title">{item.label}</h5>
-              <p className="card-text fs-4">{item.value}</p>
-            </div>
-          </div>
+        <div key={index} className="stat-card">
+          <h5>{item.label}</h5>
+          <p>{item.value}</p>
         </div>
       ))}
     </div>

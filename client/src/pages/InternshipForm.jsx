@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./InternshipForm.css";
+import Header from '../components/Navbar'
 
 // 🔄 Normalization map for popular companies
 const companyNameMap = {
@@ -227,12 +228,7 @@ function InternshipForm() {
   return (
     <>
       <div className="header">
-        <img
-          src="https://media.licdn.com/dms/image/v2/C560BAQFKt8O5GdaFjw/company-logo_200_200/company-logo_200_200/0/1680080095222/vnr_vignanajyothiinstituteofengineeringandtechnology_logo?e=2147483647&v=beta&t=nV3OFiSPyeDZdeZib-pHBlNwN-i1S73KwQljcRw3FvY"
-          alt="VNR Vignana Jyothi Logo"
-          style={{ width: '60px', height: '60px', marginRight: '15px' }}
-        />
-        <h1 className="mb-0">VNR Vignana Jyothi Institute of Engineering and Technology</h1>
+       <Header/>
       </div>
       <button className="back-btn btn btn-secondary my-1 mx-2" onClick={() => navigate('/home')}>
         ⬅ Back to Home

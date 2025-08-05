@@ -20,6 +20,7 @@ import Upload from './pages/Upload';
 import Profile from './pages/Profile';
 import Landing from './pages/Landing';
 // import LoginGuest from './pages/Login_guest';
+import Organizations from './pages/Organizations';
 import GuestDashboard from './pages/GuestDashboard';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -51,6 +52,7 @@ const App = () => {
           <Route path="internships" element={<Internships />} />
           <Route path="feedbacks" element={<Feedbacks />} />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="organizations" element={<Organizations />} />
         </Route>
 
         {/* Redirect all unknown routes */}

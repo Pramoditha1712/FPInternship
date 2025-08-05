@@ -1,55 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./InternshipForm.css";
-import Header from '../components/Navbar'
-
-// 🔄 Normalization map for popular companies
-const companyNameMap = {
-  "jpmorgan chase": "JPMC",
-  "jp morgan chase": "JPMC",
-  "jpmorgan chase & co.": "JPMC",
-  "jpmorgan chase and co": "JPMC",
-  "jpmorgan chase & co": "JPMC",
-  "jpmorgan and chase": "JPMC",
-  "jpmc": "JPMC",
-  "j p morgan": "JPMC",
-  "jpmorganchase": "JPMC",
-
-  "amazon": "Amazon",
-  "amazon inc": "Amazon",
-  "amazon.com": "Amazon",
-
-  "google": "Google",
-  "google inc": "Google",
-  "alphabet": "Google",
-
-  "microsoft": "Microsoft",
-  "msft": "Microsoft",
-
-  "tcs": "TCS",
-  "tata consultancy services": "TCS",
-
-  "infosys": "Infosys",
-  "infy": "Infosys",
-
-  "wipro": "Wipro",
-
-  "cognizant": "Cognizant",
-  "cts": "Cognizant",
-
-  "accenture": "Accenture",
-
-  "uravu labs": "Uravu Labs",
-  "uravu laboratories": "Uravu Labs",
-  "Uravu Laboratories":"Uravu Labs",
-  "Uravu laboratories":"Uravu Labs",
-  "tech mahindra": "Tech Mahindra",
-  "choice solutions limited": "Choice Solutions",
-  "choice solutions": "Choice Solutions",
-  "drdo": "DRDO"
-  // Add more as needed
-};
-
 
 function InternshipForm() {
   const navigate = useNavigate();
@@ -70,33 +21,41 @@ function InternshipForm() {
     package: "",
     startDate: "",
     endDate: "",
-    internshipType: ""
+    internshipType: "" // ✅ Local field only
   });
 
   const [errors, setErrors] = useState({});
   const [offerFile, setOfferFile] = useState(null);
   const [approvalFile, setApprovalFile] = useState(null);
   const [nocFile, setNocFile] = useState(null);
-  const [uniqueCompanies, setUniqueCompanies] = useState([]);
-
-
+  const [organizations, setOrganizations] = useState([]);
   const semesters = ["1-1", "1-2", "2-1", "2-2", "3-1", "3-2", "4-1", "4-2"];
+
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/organizations");
+        const data = await res.json();
+        setOrganizations(data);
+      } catch (err) {
+        console.error("Failed to fetch organizations:", err);
+      }
+    };
+    fetchOrganizations();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let updatedFormData = { ...formData };
 
-    if (name === "organizationName") {
-      const inputValue = value.toLowerCase().trim();
-      const normalized = companyNameMap[inputValue] || value;
-      updatedFormData.organizationName = normalized;
-    } else {
-      updatedFormData[name] = value;
-    }
+    let updatedFormData = { ...formData, [name]: value };
 
+    // ✅ Auto-set package for internship type
     if (name === "internshipType") {
-      if (value === "Unpaid") updatedFormData.package = "0";
-      else if (value === "Paid" && formData.package === "0") updatedFormData.package = "";
+      if (value === "Unpaid") {
+        updatedFormData.package = "0";
+      } else if (value === "Paid" && formData.package === "0") {
+        updatedFormData.package = "";
+      }
     }
 
     if (name === "startDate" || name === "endDate") {
@@ -105,10 +64,17 @@ function InternshipForm() {
       if (start && end && start < end) {
         const diffTime = Math.abs(end - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        let duration = diffDays >= 30
-          ? `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? "s" : ""}` +
-            (diffDays % 30 > 0 ? ` ${diffDays % 30} day${diffDays % 30 > 1 ? "s" : ""}` : "")
-          : `${diffDays} day${diffDays > 1 ? "s" : ""}`;
+        let duration = "";
+        if (diffDays >= 30) {
+          const months = Math.floor(diffDays / 30);
+          const days = diffDays % 30;
+          duration = months + " month" + (months > 1 ? "s" : "");
+          if (days > 0) {
+            duration += " " + days + " day" + (days > 1 ? "s" : "");
+          }
+        } else {
+          duration = diffDays + " day" + (diffDays > 1 ? "s" : "");
+        }
         updatedFormData.duration = duration;
       } else {
         updatedFormData.duration = "";
@@ -132,7 +98,7 @@ function InternshipForm() {
 
   const validateForm = () => {
     for (const key in formData) {
-      if (key === "internshipType") continue;
+      if (key === "internshipType") continue; // ✅ Local only
       if (formData[key].trim() === "") {
         alert(`${key} is required.`);
         return false;
@@ -167,10 +133,11 @@ function InternshipForm() {
     if (!validateForm()) return;
 
     let durationValue = formData.duration;
+
     const rollNo = formData.rollNo;
 
     const renamedOfferFile = offerFile ? new File([offerFile], `${rollNo}_offer.pdf`, { type: offerFile.type }) : null;
-    const renamedApprovalFile = approvalFile ? new File([approvalFile], `${rollNo}_approval.pdf`, { type: approvalFile.type }) : null;
+    const renamedApprovalFile = approvalFile ? new File([approvalFile],` ${rollNo}_approval.pdf`, { type: approvalFile.type }) : null;
     const renamedNocFile = nocFile ? new File([nocFile], `${rollNo}_noc.pdf`, { type: nocFile.type }) : null;
 
     const form = new FormData();
@@ -201,34 +168,16 @@ function InternshipForm() {
       alert("An error occurred.");
     }
   };
-    
-  const fetchInternships = async () => {
-    const query = buildQuery();
-    try {
-      const res = await axios.get(`http://localhost:8080/api/admin/internships/filter?${query}`);
-      const data = Array.isArray(res.data) ? res.data : res.data.internships || [];
-      setInternships(data);
-  
-      
-      const companies = [...new Set(
-        data.map(i => (i.organizationName || "").trim().toUpperCase())
-      )].filter(Boolean).sort();
-  
-      setUniqueCompanies(companies);
-      
-  
-    } catch (err) {
-      console.error("Error fetching internships:", err);
-      setInternships([]);
-      setUniqueCompanies([]);
-    }
-  };
-  
 
   return (
     <>
       <div className="header">
-       <Header/>
+        <img
+          src="https://media.licdn.com/dms/image/v2/C560BAQFKt8O5GdaFjw/company-logo_200_200/company-logo_200_200/0/1680080095222/vnr_vignanajyothiinstituteofengineeringandtechnology_logo?e=2147483647&v=beta&t=nV3OFiSPyeDZdeZib-pHBlNwN-i1S73KwQljcRw3FvY"
+          alt="VNR Vignana Jyothi Logo"
+          style={{ width: '60px', height: '60px', marginRight: '15px' }}
+        />
+        <h1 className="mb-0">VNR Vignana Jyothi Institute of Engineering and Technology</h1>
       </div>
       <button className="back-btn btn btn-secondary my-1 mx-2" onClick={() => navigate('/home')}>
         ⬅ Back to Home
@@ -236,7 +185,7 @@ function InternshipForm() {
       <div className="form-container">
         <h1>UG/PG Internship Portal</h1>
         <form className="internship-form" onSubmit={handleSubmit}>
-          {["rollNo", "name", "branch", "section", "email", "phoneNo", "role", "organizationName", "hrEmail", "hrPhone", "duration", "package"].map((field) => (
+          {["rollNo", "name", "branch", "section", "email", "phoneNo", "role", "hrEmail", "hrPhone", "duration", "package"].map((field) => (
             <div className="form-row" key={field}>
               <input
                 type={field === "email" || field === "hrEmail" ? "email" : "text"}
@@ -249,6 +198,29 @@ function InternshipForm() {
               {errors[field] && <span className="error">{errors[field]}</span>}
             </div>
           ))}
+
+          {/* ✅ Dropdown for Organization Name */}
+          <div className="form-row">
+            <label>Organization Name</label>
+            <select
+              name="organizationName"
+              value={formData.organizationName}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Organization</option>
+              {organizations.map((org) => (
+                <option key={org._id} value={org.name}>
+                  {org.name}
+                </option>
+              ))}
+            </select>
+            {errors.organizationName && <span className="error">{errors.organizationName}</span>}
+          </div>
+          <p style={{ fontSize: "0.9rem", color: "gray", marginTop: "-10px", marginBottom: "15px" }}>
+            If your organization is not listed, please contact the admin to add it.
+          </p>
+
 
           <div className="form-row">
             <label>Semester</label>

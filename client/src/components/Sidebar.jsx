@@ -26,6 +26,7 @@ const Sidebar = () => {
             <li className={location.pathname === '/internships' ? 'active' : ''}><Link to="internships">Internships</Link></li>
             <li className={location.pathname === '/feedbacks' ? 'active' : ''}><Link to="feedbacks">Feedbacks</Link></li>
             <li className={location.pathname === '/analytics' ? 'active' : ''}><Link to="analytics">Analytics</Link></li>
+            <li className={location.pathname === '/organizations' ? 'active' : ''}><Link to="organizations">Organizations</Link></li>
             {localStorage.getItem('adminToken') && (
             <li>
               <button

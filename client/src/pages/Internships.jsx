@@ -231,7 +231,7 @@
       };
 
       return (
-        <div className="internship-page container-fluid ">
+        <div className="internship-page container ">
           <Header/>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="text-center flex-grow-1 fw-bold mb-0 mt-4 border-bottom pb-2">Internships</h1>

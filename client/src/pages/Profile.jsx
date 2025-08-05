@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import ProfilePic from '../assets/profile.svg'
 
 import './Profile.css'
 
@@ -105,8 +106,15 @@ export default function Profile() {
   </div>
 </header>
 
-      <div className="container my-5">
-        <h2 className="text-center mb-5 text-primary fw-bold">👤 Your Profile</h2>
+      <div className="container ">
+      <h2 className="text-center mb-5 text-primary fw-bold d-flex align-items-center justify-content-center gap-3">
+        <img
+          src={ProfilePic}
+          alt="Profile"
+          style={{ width: '100px', height: '200px' }}
+        />
+        Your Profile
+      </h2>
 
         {loading && <div className="alert alert-info">Loading your profile...</div>}
         {error && <div className="alert alert-danger">{error}</div>}
@@ -148,58 +156,104 @@ export default function Profile() {
 
               {/* === Internships === */}
               <div className="tab-pane fade" id="internships">
-                <div className="d-flex justify-content-center">
-                  <div style={styles.card}>
-                    <h5 className="text-center text-secondary mb-4">💼 Your Internships</h5>
-                    {(userProfile.internships || []).length > 0 ? (
-                      <ul className="list-group list-group-flush">
-                        {(userProfile.internships || []).map((internship) => (
-                          <li key={internship._id || internship.internshipID} className="list-group-item">
-                            <strong className=''>Company: {internship.organizationName}</strong><br />
-                            <strong>Role: {internship.role}</strong><br />
-                            <small className="text-muted ">
-                              {new Date(internship.startingDate).toLocaleDateString()} — {new Date(internship.endingDate).toLocaleDateString()}
-                            </small>
-                            <div className="mt-3 d-flex flex-wrap gap-4">
-                              {/* Offer Letter */}
-                              {internship.offerLetter && (
-                                <div className="text-center">
-                                  <div>Offer Letter</div>
-                                  <a href={internship.offerLetter.includes("drive.google.com") ? convertDriveLink(internship.offerLetter) : `http://localhost:8080${internship.offerLetter}`} target="_blank" rel="noopener noreferrer">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" alt="Offer Letter" style={{ width: '50px', height: '50px' }} />
-                                  </a>
-                                </div>
-                              )}
-                              {/* Application Letter */}
-                              {internship.applicationLetter && (
-                                <div className="text-center">
-                                  <div>Approval Letter</div>
-                                  <a href={internship.applicationLetter.includes("drive.google.com") ? convertDriveLink(internship.applicationLetter) : `http://localhost:8080${internship.applicationLetter}`} target="_blank" rel="noopener noreferrer">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" alt="Approval Letter" style={{ width: '50px', height: '50px' }} />
-                                  </a>
-                                </div>
-                              )}
-                              {/* NOC */}
-                              {internship.noc ? (
-                                <div className="text-center">
-                                  <div>NOC</div>
-                                  <a href={internship.noc.includes("drive.google.com") ? convertDriveLink(internship.noc) : `http://localhost:8080${internship.noc}`} target="_blank" rel="noopener noreferrer">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" alt="NOC" style={{ width: '50px', height: '50px' }} />
-                                  </a>
-                                </div>
-                              ) : (
-                                <div className="text-muted text-center">NOC not uploaded</div>
-                              )}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-muted text-center">No internships found.</p>
-                    )}
+  <div className="d-flex justify-content-center py-4 px-2">
+    <div style={{ ...styles.card, maxWidth: '800px', width: '100%', padding: '30px' }}>
+      <h4 className="text-center text-secondary mb-4">💼 Your Internships</h4>
+      
+      {(userProfile.internships || []).length > 0 ? (
+        <ul className="list-group list-group-flush">
+          {(userProfile.internships || []).map((internship) => (
+            <li
+              key={internship._id || internship.internshipID}
+              className="list-group-item mb-4 p-4 shadow-sm rounded"
+              style={{ backgroundColor: '#f9f9f9' }}
+            >
+              <p className="mb-2"><strong>Company:</strong> {internship.organizationName}</p>
+              <p className="mb-2"><strong>Role:</strong> {internship.role}</p>
+              <p className="mb-3 text-muted">
+                <small>
+                  {new Date(internship.startingDate).toLocaleDateString()} — {new Date(internship.endingDate).toLocaleDateString()}
+                </small>
+              </p>
+
+              <div className="d-flex flex-wrap gap-4 justify-content-start">
+                {/* Offer Letter */}
+                {internship.offerLetter && (
+                  <div className="text-center">
+                    <div className="fw-semibold mb-1">Offer Letter</div>
+                    <a
+                      href={
+                        internship.offerLetter.includes('drive.google.com')
+                          ? convertDriveLink(internship.offerLetter)
+                          : `http://localhost:8080${internship.offerLetter}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg"
+                        alt="Offer Letter"
+                        style={{ width: '50px', height: '50px' }}
+                      />
+                    </a>
                   </div>
-                </div>
+                )}
+
+                {/* Application Letter */}
+                {internship.applicationLetter && (
+                  <div className="text-center">
+                    <div className="fw-semibold mb-1">Approval Letter</div>
+                    <a
+                      href={
+                        internship.applicationLetter.includes('drive.google.com')
+                          ? convertDriveLink(internship.applicationLetter)
+                          : `http://localhost:8080${internship.applicationLetter}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg"
+                        alt="Approval Letter"
+                        style={{ width: '50px', height: '50px' }}
+                      />
+                    </a>
+                  </div>
+                )}
+
+                {/* NOC */}
+                {internship.noc ? (
+                  <div className="text-center">
+                    <div className="fw-semibold mb-1">NOC</div>
+                    <a
+                      href={
+                        internship.noc.includes('drive.google.com')
+                          ? convertDriveLink(internship.noc)
+                          : `http://localhost:8080${internship.noc}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg"
+                        alt="NOC"
+                        style={{ width: '50px', height: '50px' }}
+                      />
+                    </a>
+                  </div>
+                ) : (
+                  <div className="text-muted text-center">NOC not uploaded</div>
+                )}
               </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-muted text-center mt-4">No internships found.</p>
+      )}
+    </div>
+  </div>
+</div>
 
               {/* === Feedback === */}
               <div className="tab-pane fade" id="feedbacks">

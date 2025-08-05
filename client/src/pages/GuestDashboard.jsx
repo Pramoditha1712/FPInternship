@@ -1,119 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled, { keyframes } from 'styled-components';
+import Header from '../components/Navbar';
+import guestPic from '../assets/guest.png'
 
-// === Styled Components ===
-// Put this near your other styled-components
-const ReportContainer = styled.div`
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  max-width: 900px;
-  margin: 30px auto;
-`;
-
-const ReportHeading = styled.h2`
+// ========== Styled Components ==========
+const PageWrapper = styled.div`
   display: flex;
-  align-items: center;
-  font-size: 22px;
-  margin-bottom: 20px;
-  color: #1f2937;
-
-  &::before {
-    content: '📄';
-    margin-right: 10px;
-  }
+  flex-direction: column;
+  min-height: 100vh;
 `;
-
-const SectionHeading = styled.h4`
-  margin: 15px 0 10px 0;
-  color: #4f46e5;
-`;
-
-const rollNoBadge = styled.span`
-  display: inline-block;
-  background: #f3f4f6;
-  padding: 4px 10px;
-  border-radius: 4px;
-  margin: 4px;
-  font-family: monospace;
-  transition: background 0.3s;
-
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
-
-const StyledHR = styled.hr`
-  border: none;
-  border-top: 1px solid #ddd;
-  margin: 20px 0;
-`;
-
 
 const Dashboard = styled.div`
   display: flex;
-  height: 100vh;
-  font-family: Arial, sans-serif;
+  flex: 1;
 `;
 
 const Sidebar = styled.div`
   width: 250px;
-  background-color: #1f2937;
-  color: #fff;
+  background: linear-gradient(135deg, #004e92 0%, #000428 100%);
+  color: white;
   padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
 `;
 
 const SidebarHeader = styled.h2`
-  margin-bottom: 15px;
+  font-size: 18px;
+  margin-bottom: 10px;
 `;
 
 const List = styled.ul`
   list-style: none;
-  padding-left: 0;
-  flex: 1;
+  padding: 0;
 `;
 
 const BranchButton = styled.button`
   background: none;
   border: none;
   color: #cbd5e1;
+  padding: 8px 10px;
   text-align: left;
   width: 100%;
-  padding: 8px 10px;
   cursor: pointer;
   font-size: 15px;
 
   &:hover {
-    background-color: #374151;
+    background: #1f2937;
   }
 
   &.active {
-    background-color: #4b5563;
+    background: #334155;
     font-weight: bold;
-    color: #fff;
+    color: white;
   }
 `;
 
 const SectionList = styled.ul`
-  margin-left: 10px;
+  padding-left: 10px;
 `;
 
 const LogoutButton = styled.button`
   background: #ef4444;
-  border: none;
-  color: #fff;
-  width: 100%;
+  color: white;
   padding: 10px;
   margin-top: 30px;
-  cursor: pointer;
-  font-size: 15px;
+  border: none;
+  width: 100%;
   border-radius: 5px;
-  transition: background 0.3s;
 
   &:hover {
     background: #dc2626;
@@ -123,8 +75,40 @@ const LogoutButton = styled.button`
 const Details = styled.div`
   flex: 1;
   padding: 40px;
-  overflow-y: auto;
   background: linear-gradient(to bottom right, #f9fafb, #ffffff);
+  overflow-y: auto;
+`;
+
+const ReportContainer = styled.div`
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+`;
+
+const ReportHeading = styled.h2`
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #1f2937;
+`;
+
+const SectionHeading = styled.h4`
+  margin: 15px 0 10px;
+  color: #4f46e5;
+`;
+
+const RollNoBadge = styled.span`
+  background: #e5e7eb;
+  padding: 4px 10px;
+  border-radius: 5px;
+  margin: 5px;
+  display: inline-block;
+  font-family: monospace;
+`;
+
+const StyledHR = styled.hr`
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
 `;
 
 const Table = styled.table`
@@ -133,120 +117,70 @@ const Table = styled.table`
   margin-top: 10px;
 
   th, td {
+    padding: 10px;
     border: 1px solid #ddd;
-    padding: 8px;
   }
 
   th {
-    background-color: #f3f4f6;
+    background-color: #f1f5f9;
   }
 `;
 
 const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #555;
   text-align: center;
+  color: #555;
+  padding: 40px;
 `;
 
 const float = keyframes`
-  0% { transform: translatey(0px); }
-  50% { transform: translatey(-5px); }
-  100% { transform: translatey(0px); }
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
 `;
 
 const EmptyImage = styled.img`
-  width: 120px;
-  opacity: 0.5;
-  margin-bottom: 20px;
+  width: 400px;
+  opacity: 0.6;
   animation: ${float} 3s ease-in-out infinite;
-`;
-
-const Loading = styled.div`
-  margin: auto;
-  font-size: 20px;
-`;
-
-const Error = styled.div`
-  margin: auto;
-  font-size: 20px;
-  color: red;
 `;
 
 const ExpandIcon = styled.span`
   margin-right: 5px;
-  display: inline-block;
 `;
 
+// ========== Helper Functions ==========
 const groupStudentsBySemesterAsYear = (students) => {
   const grouped = {};
-  const romanToNumber = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4 };
-
+  const romanToNumber = { I: 1, II: 2, III: 3, IV: 4 };
   students.forEach(student => {
     let semester = student.semester || 'Unknown';
-    let yearLabel = 'Unknown Year';
+    let yearLabel = 'Unknown';
 
-    const romanMatch = semester.match(/^([IVXLCDM]+)-[IVXLCDM]+$/i);
+    const romanMatch = semester.match(/^([IV]+)-[IV]+$/i);
     if (romanMatch) {
       const roman = romanMatch[1].toUpperCase();
       const yearNum = romanToNumber[roman];
       if (yearNum) {
-        const suffix = yearNum === 1 ? 'st' : yearNum === 2 ? 'nd' : yearNum === 3 ? 'rd' : 'th';
+        const suffix = ['st', 'nd', 'rd', 'th'][yearNum - 1] || 'th';
         yearLabel = `${yearNum}${suffix} Year`;
       }
     } else {
-      const arabicMatch = semester.match(/^(\d+)-\d+$/);
-      if (arabicMatch) {
-        const yearNum = parseInt(arabicMatch[1], 10);
-        const suffix = yearNum === 1 ? 'st' : yearNum === 2 ? 'nd' : yearNum === 3 ? 'rd' : 'th';
+      const numMatch = semester.match(/^(\d+)-\d+$/);
+      if (numMatch) {
+        const yearNum = parseInt(numMatch[1]);
+        const suffix = ['st', 'nd', 'rd'][yearNum - 1] || 'th';
         yearLabel = `${yearNum}${suffix} Year`;
-      } else {
-        yearLabel = semester;
       }
     }
 
-    if (!grouped[yearLabel]) {
-      grouped[yearLabel] = [];
-    }
+    if (!grouped[yearLabel]) grouped[yearLabel] = [];
     grouped[yearLabel].push(student);
   });
 
   return grouped;
 };
 
-const getInternsReportData = (categorizedData) => {
-  let result = '';
-  const today = new Date().toLocaleDateString('en-GB');
-  result += `Details of Interns on ${today}\n\n`;
-
-  Object.entries(categorizedData).forEach(([branch, sections]) => {
-    Object.entries(sections).forEach(([section, students]) => {
-      const studentsBySemester = {};
-      students.forEach((s) => {
-        const sem = s.semester || 'Unknown';
-        if (!studentsBySemester[sem]) studentsBySemester[sem] = [];
-        studentsBySemester[sem].push(s);
-      });
-
-      Object.entries(studentsBySemester).forEach(([sem, group]) => {
-        result += ` ${sem} ${branch} ${section}\n`;
-        if (group.length === 0) {
-          result += '--\n\n';
-        } else {
-          const rollNos = group.map(s => s.rollNo).join(', ');
-          result += rollNos + '\n\n';
-        }
-      });
-    });
-  });
-
-  return result;
-};
-
-
+// ========== Main Component ==========
 const GuestDashboard = () => {
   const [categorizedData, setCategorizedData] = useState({});
   const [selectedBranch, setSelectedBranch] = useState('');
@@ -254,26 +188,20 @@ const GuestDashboard = () => {
   const [students, setStudents] = useState([]);
   const [selectedYear, setSelectedYear] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [showInternsReport, setShowInternsReport] = useState(false);
 
   useEffect(() => {
-    const fetchGuestDashboard = async () => {
+    const fetchData = async () => {
       try {
         const res = await axios.get('http://localhost:8080/guest/guest-dashboard');
         setCategorizedData(res.data.categorized || {});
       } catch (err) {
-        console.error(err);
-        setError('Failed to fetch guest dashboard data');
+        console.error('Error fetching dashboard data:', err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchGuestDashboard();
-    const interval = setInterval(fetchGuestDashboard, 5 * 60 * 1000);
-
-    return () => clearInterval(interval);
+    fetchData();
   }, []);
 
   const handleBranchClick = (branch) => {
@@ -298,170 +226,212 @@ const GuestDashboard = () => {
     window.location.href = '/';
   };
 
-  if (loading) return <Loading>Loading guest dashboard...</Loading>;
-  if (error) return <Error>{error}</Error>;
-
   const groupedStudents = groupStudentsBySemesterAsYear(students);
 
   return (
-    <Dashboard>
-      <Sidebar>
-        <SidebarHeader>Branches</SidebarHeader>
-        <List>
-          {Object.keys(categorizedData).map((branch) => (
-            <li key={branch}>
-              <BranchButton
-                className={branch === selectedBranch ? 'active' : ''}
-                onClick={() => handleBranchClick(branch)}
-              >
-                <ExpandIcon>{branch === selectedBranch ? '▼' : '▶'}</ExpandIcon>
-                {branch}
-              </BranchButton>
-              {branch === selectedBranch && (
-                <SectionList>
-                  {Object.keys(categorizedData[branch]).map((section) => (
-                    <li key={section}>
-                      <BranchButton
-                        className={section === selectedSection ? 'active' : ''}
-                        onClick={() => handleSectionClick(section)}
-                      >
-                        <ExpandIcon>{section === selectedSection ? '▼' : '▶'}</ExpandIcon>
-                        {section}
-                      </BranchButton>
-                    </li>
-                  ))}
-                </SectionList>
-              )}
-            </li>
-          ))}
-        </List>
-        <a
-          href="#"
-          style={{
-            color: '#fff',
-            textDecoration: 'underline',
-            marginTop: '20px',
-            cursor: 'pointer'
-          }}
-          onClick={() => {
-            setSelectedBranch('');
-            setSelectedSection('');
-            setShowInternsReport(true);
-          }}
-        >
-          Interns Report
-        </a>
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-      </Sidebar>
-
-      <Details>
-        {showInternsReport ? (
-          <ReportContainer>
-    <ReportHeading>Interns Report on {new Date().toLocaleDateString('en-GB')}</ReportHeading>
-
-    {Object.entries(categorizedData).map(([branch, sections]) =>
-      Object.entries(sections).map(([section, students]) => {
-        const studentsBySemester = {};
-        students.forEach(s => {
-          const sem = s.semester || 'Unknown';
-          if (!studentsBySemester[sem]) studentsBySemester[sem] = [];
-          studentsBySemester[sem].push(s);
-        });
-
-        return Object.entries(studentsBySemester).map(([sem, group]) => (
-          <div key={`${branch}-${section}-${sem}`}>
-            <SectionHeading> {sem} {branch} {section}</SectionHeading>
-            {group.length > 0 ? (
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                {group.map((s) => (
-                  <rollNoBadge key={s.rollNo}>
-                    {s.rollNo} ,
-                  </rollNoBadge>
-                ))}
-              </div>
-            ) : (
-              <p>--</p>
-            )}
-            <StyledHR />
-          </div>
-        ));
-      })
-    )}
-  </ReportContainer>
-
-        ) : selectedBranch && selectedSection ? (
-          <>
-            <h3>Branch: {selectedBranch} | Section: {selectedSection}</h3>
-            <p>Total students: {students.length}</p>
-
-            {students.length > 0 ? (
-              <>
-                <div style={{ marginBottom: '20px' }}>
-                  <label>Select Year: </label>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                  >
-                    <option value="">-- Select Year --</option>
-                    <option value="1st Year">1st Year</option>
-                    <option value="2nd Year">2nd Year</option>
-                    <option value="3rd Year">3rd Year</option>
-                    <option value="4th Year">4th Year</option>
-                  </select>
-                </div>
-
-                {selectedYear ? (
-                  (() => {
-                    const group = groupedStudents[selectedYear] || [];
-                    if (group.length === 0) {
-                      return <p>No data found for this year.</p>;
-                    }
-                    return (
-                      <div style={{ marginBottom: '25px' }}>
-                        <h4>{selectedYear} Students</h4>
-                        <Table>
-                          <thead>
-                            <tr>
-                              <th>Name</th>
-                              <th>Roll Number</th>
-                              <th>Email</th>
-                              <th>Organization</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {group.map((student) => (
-                              <tr key={student._id}>
-                                <td>{student.name}</td>
-                                <td>{student.rollNo}</td>
-                                <td>{student.email}</td>
-                                <td>{student.organizationName}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      </div>
-                    );
-                  })()
-                ) : (
-                  <p>Please select a year to display students.</p>
+    <PageWrapper>
+      <Header />
+      <Dashboard>
+        <Sidebar>
+          <SidebarHeader>Branches</SidebarHeader>
+          <List>
+            {Object.keys(categorizedData).map(branch => (
+              <li key={branch}>
+                <BranchButton
+                  className={branch === selectedBranch ? 'active' : ''}
+                  onClick={() => handleBranchClick(branch)}
+                >
+                  <ExpandIcon>{branch === selectedBranch ? '▼' : '▶'}</ExpandIcon>
+                  {branch}
+                </BranchButton>
+                {branch === selectedBranch && (
+                  <SectionList>
+                    {Object.keys(categorizedData[branch]).map(section => (
+                      <li key={section}>
+                        <BranchButton
+                          className={section === selectedSection ? 'active' : ''}
+                          onClick={() => handleSectionClick(section)}
+                        >
+                          <ExpandIcon>{section === selectedSection ? '▼' : '▶'}</ExpandIcon>
+                          {section}
+                        </BranchButton>
+                      </li>
+                    ))}
+                  </SectionList>
                 )}
-              </>
-            ) : (
-              <p>No students in this section.</p>
-            )}
-          </>
-        ) : (
-          <EmptyState>
-            <EmptyImage
-              src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-              alt="Dashboard"
-            />
-            <h3>Welcome to the Guest Dashboard!</h3>
-            <p>Select a branch, section, and year to view internship details.</p>
-          </EmptyState>
-        )}
-      </Details>
-    </Dashboard>
+              </li>
+            ))}
+          </List>
+          <a
+            href="#"
+            style={{ color: '#93c5fd', marginTop: '20px', display: 'inline-block' }}
+            onClick={() => {
+              setSelectedBranch('');
+              setSelectedSection('');
+              setShowInternsReport(true);
+            }}
+          >
+            View Interns Report
+          </a>
+          <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+        </Sidebar>
+
+        <Details>
+          {loading ? (
+            <p>Loading...</p>
+          ) : showInternsReport ? (
+            <ReportContainer>
+              <ReportHeading>Interns Report – {new Date().toLocaleDateString()}</ReportHeading>
+              {Object.entries(categorizedData).map(([branch, sections]) =>
+                Object.entries(sections).map(([section, students]) => {
+                  const studentsBySemester = {};
+                  students.forEach(s => {
+                    const sem = s.semester || 'Unknown';
+                    if (!studentsBySemester[sem]) studentsBySemester[sem] = [];
+                    studentsBySemester[sem].push(s);
+                  });
+
+                  return Object.entries(studentsBySemester).map(([sem, group]) => (
+                    <div key={`${branch}-${section}-${sem}`}>
+                      <SectionHeading>{sem} {branch} {section}</SectionHeading>
+                      {group.length > 0 ? (
+                        group.map(s => (
+                          <RollNoBadge key={s.rollNo}>{s.rollNo}</RollNoBadge>
+                        ))
+                      ) : (
+                        <p>--</p>
+                      )}
+                      <StyledHR />
+                    </div>
+                  ));
+                })
+              )}
+            </ReportContainer>
+          ) : selectedBranch && selectedSection ? (
+            <>
+              <h3>{selectedBranch} - {selectedSection}</h3>
+              <p>Total Students: {students.length}</p>
+              <label>Select Year:</label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+              >
+                <option value="">-- Select Year --</option>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+              </select>
+
+              {selectedYear && groupedStudents[selectedYear]?.length ? (
+                <>
+                  <h4>{selectedYear} Students</h4>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Roll No</th>
+                        <th>Email</th>
+                        <th>Organization</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groupedStudents[selectedYear].map(s => (
+                        <tr key={s._id}>
+                          <td>{s.name}</td>
+                          <td>{s.rollNo}</td>
+                          <td>{s.email}</td>
+                          <td>{s.organizationName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </>
+              ) : (
+                <p>Please select a valid year to view students.</p>
+              )}
+            </>
+          ) : (
+            <EmptyState style={{ padding: '2rem', textAlign: 'center' }}>
+ 
+
+  <h2 style={{ fontSize: '2rem', color: '#222', marginBottom: '0.4rem' }}>
+    Welcome to the Guest Internship Dashboard
+  </h2>
+
+  <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1.2rem' }}>
+    Discover how students are gaining real-world experience through internships.
+  </p>
+
+  <EmptyImage
+    src={guestPic}
+    alt="Internship Insights"
+    style={{  marginBottom: '1.5rem', opacity: 0.95 }}
+  />
+
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: '1.5rem',
+    marginBottom: '2rem',
+  }}>
+    <div style={{
+      background: '#f9f9f9',
+      padding: '1.2rem 1.5rem',
+      borderRadius: '10px',
+      maxWidth: '280px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+      textAlign: 'left',
+    }}>
+      <h3 style={{ color: '#004e92', fontSize: '1.15rem' }}>🔍 Explore Insights</h3>
+      <p style={{ fontSize: '0.95rem', color: '#555', marginTop: '0.5rem' }}>
+        Filter by <strong>branch</strong> and <strong>year</strong> to explore which students are involved in internships today.
+      </p>
+    </div>
+
+    <div style={{
+      background: '#f9f9f9',
+      padding: '1.2rem 1.5rem',
+      borderRadius: '10px',
+      maxWidth: '280px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+      textAlign: 'left',
+    }}>
+      <h3 style={{ color: '#004e92', fontSize: '1.15rem' }}>📊 Domain & Company Stats</h3>
+      <p style={{ fontSize: '0.95rem', color: '#555', marginTop: '0.5rem' }}>
+        Discover where students are interning — from startups to top tech companies.
+      </p>
+    </div>
+
+    <div style={{
+      background: '#f9f9f9',
+      padding: '1.2rem 1.5rem',
+      borderRadius: '10px',
+      maxWidth: '280px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+      textAlign: 'left',
+    }}>
+      <h3 style={{ color: '#004e92', fontSize: '1.15rem' }}>💡 Real-Time Snapshot</h3>
+      <p style={{ fontSize: '0.95rem', color: '#555', marginTop: '0.5rem' }}>
+        Get a current-day snapshot of all active internship participation, updated instantly based on student submissions.
+      </p>
+    </div>
+  </div>
+
+  <p style={{ color: '#444', fontSize: '1rem', marginBottom: '1rem' }}>
+    This guest view gives you a transparent lens into internship engagement across departments.
+  </p>
+
+  <p style={{ fontSize: '0.9rem', color: '#777' }}>
+    No login required. Just insights — fast, reliable, and inspiring.
+  </p>
+</EmptyState>
+
+          )}
+        </Details>
+      </Dashboard>
+    </PageWrapper>
   );
 };
 

@@ -110,4 +110,45 @@
 .styled-table th:last-child {
   border-top-right-radius: 12px;
 }
+/* Make the list items breathe */
+.list-group-item {
+  margin-bottom: 2rem;
+  padding: 2rem;
+  border-radius: 1rem;
+  background-color: #f9fafb;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Add space and alignment to PDF icon blocks */
+.list-group-item .d-flex.flex-wrap {
+  gap: 2rem !important;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+/* Style the document title text */
+.list-group-item .text-center div:first-child {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+/* Center and style the PDF icons */
+.list-group-item img {
+  width: 60px;
+  height: 60px;
+  transition: transform 0.2s ease;
+}
+
+.list-group-item img:hover {
+  transform: scale(1.1);
+}
+
+/* Make the internship heading stand out */
+.text-secondary.mb-4 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937 !important;
+}
+
 

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Header from '../components/Navbar'
+
+import './Profile.css'
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -154,9 +155,9 @@ export default function Profile() {
                       <ul className="list-group list-group-flush">
                         {(userProfile.internships || []).map((internship) => (
                           <li key={internship._id || internship.internshipID} className="list-group-item">
-                            <strong>Company: {internship.organizationName}</strong><br />
+                            <strong className=''>Company: {internship.organizationName}</strong><br />
                             <strong>Role: {internship.role}</strong><br />
-                            <small className="text-muted">
+                            <small className="text-muted ">
                               {new Date(internship.startingDate).toLocaleDateString()} — {new Date(internship.endingDate).toLocaleDateString()}
                             </small>
                             <div className="mt-3 d-flex flex-wrap gap-4">

@@ -6,7 +6,7 @@ const Organization = require('../models/Organization');
 router.get('/', async (req, res) => {
   try {
     const organizations = await Organization.find({});
-    res.json({message:"organizations",organizations});
+    res.json(organizations);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch organizations' });
   }

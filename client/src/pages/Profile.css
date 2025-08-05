@@ -1,0 +1,169 @@
+/* Profile Page Modern Styling */
+
+.profile-container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 25px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.07);
+  }
+  
+  .profile-header {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0d6efd;
+  }
+  
+  .nav-pills .nav-link {
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: background-color 0.3s;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+  }
+  
+  .nav-pills .nav-link:hover {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+  }
+  
+  .profile-tab-card {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 25px;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .profile-label {
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .profile-value {
+    margin-left: 10px;
+    color: #212529;
+  }
+  
+  .pdf-icon {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .pdf-icon:hover {
+    transform: scale(1.05);
+  }
+  
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 20px;
+  }
+  
+  .text-muted-center {
+    text-align: center;
+    color: #6c757d;
+  }
+
+  /* Profile.css */
+
+body {
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+
+  
+  .logo-img {
+    width: 65px;
+    height: 65px;
+    margin-right: 20px;
+    border-radius: 8px;
+  }
+  
+  
+  .nav-pills .nav-link {
+    color: #374151;
+    font-weight: 600;
+    margin: 0 8px;
+    border-radius: 50px;
+    transition: 0.3s;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .tab-content {
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 800px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .card:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  }
+  
+  .list-group-item {
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 1rem;
+    border-radius: 12px;
+    background-color: #f9fafb;
+    margin-bottom: 10px;
+    transition: 0.3s ease;
+  }
+  
+  .list-group-item:hover {
+    background-color: #eef2f7;
+  }
+  
+  .pdf-icon {
+    width: 45px;
+    height: 45px;
+    transition: transform 0.2s;
+  }
+  
+  .pdf-icon:hover {
+    transform: scale(1.1);
+  }
+  
+  .logout-btn {
+    font-size: 18px;
+    padding: 6px 20px;
+    border-radius: 30px;
+    border: 2px solid white;
+    background-color: transparent;
+    color: white;
+    transition: 0.3s ease;
+  }
+  
+  .logout-btn:hover {
+    background-color: white;
+    color: #1e293b;
+    font-weight: bold;
+  }
+  
+  

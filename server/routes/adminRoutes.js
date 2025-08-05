@@ -503,5 +503,17 @@
       res.status(500).json({ error: "Server error" });
     }
   });
+  router.get('/remind-feedback', async (req, res) => {
+    try {
+      const sent = await sendFeedbackEmailReminders();
+      res.status(200).json({
+        message: 'Reminder emails sent successfully.',
+        data: sent
+      });
+    } catch (err) {
+      console.error('Email reminder error:', err);
+      res.status(500).json({ error: 'Failed to send reminders.' });
+    }
+  });
 
   module.exports = router;

@@ -2,6 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
+const cron = require('node-cron');
+const { sendFeedbackEmailReminders } = require('./utils/reminderEmailService');
+
+
 
 const authRoutes = require('./routes/authRoutes');
 
@@ -21,6 +25,10 @@ app.use(express.json());
 app.use((err, req, res, next) => {
   console.error('Unexpected Error:', err);
   res.status(500).json({ error: 'Internal Server Error' });
+});
+cron.schedule('0 10 * * 1,4', async () => {
+  console.log('⏰ Running feedback reminder email job...');
+  await sendFeedbackEmailReminders();
 });
 
 mongoose.connect('mongodb://127.0.0.1:27017/internship', {

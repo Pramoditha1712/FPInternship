@@ -231,7 +231,7 @@
       };
 
       return (
-        <div className="internship-page container ">
+        <div className="internship-page container-fluid ">
           <Header/>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="text-center flex-grow-1 fw-bold mb-0 mt-4 border-bottom pb-2">Internships</h1>
@@ -387,10 +387,10 @@
           )}
 
           {/* Table */}
-          <div className="card shadow-sm internship-table">
+          <div className="card shadow-sm internship-table" >
             <div className="card-body">
               <div className="table-responsive">
-                <table className="table table-striped table-hover align-middle " >
+                <table className="table table-striped table-hover align-middle"  >
                   <thead className="table-light">
                     <tr>
                       <th>Roll No</th>
@@ -405,7 +405,7 @@
                       <th>Stipend</th>
                       <th>Hr mail</th>
                       <th>Hr phone</th>
-                      <th style={{ width: "150px" }}>Documents</th>
+                      <th >Documents</th>
                       <th>Actions</th>
                     </tr>
                   </thead>

@@ -229,7 +229,7 @@ const GuestDashboard = () => {
   const groupedStudents = groupStudentsBySemesterAsYear(students);
 
   return (
-    <PageWrapper>
+   <PageWrapper>
       <Header />
       <Dashboard>
         <Sidebar>
@@ -431,7 +431,7 @@ const GuestDashboard = () => {
           )}
         </Details>
       </Dashboard>
-    </PageWrapper>
+   </PageWrapper>
   );
 };
 

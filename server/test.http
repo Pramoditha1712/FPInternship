@@ -9,3 +9,7 @@ GET http://localhost:8080/api/user/profile
 
 ###
 POST http://localhost:8080/api/admin/login
+
+###
+GET http://localhost:8080/api/organization
+

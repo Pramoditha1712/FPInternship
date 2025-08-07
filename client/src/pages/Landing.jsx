@@ -18,9 +18,17 @@ const Landing = () => {
       <section className="hero-section d-flex align-items-center justify-content-center flex-wrap">
   <div className="hero-text text-center text-md-start">
     <h1 className="gradient-text display-4 fw-bold">Welcome to InternE</h1>
-    <p className='text-dark'>
-      Streamlining Internship Processes with Clarity, Precision, and Accessibility for VNRVJIET
-    </p>
+    
+    <p className="text-dark mt-3" style={{ maxWidth: '720px', margin: '0 auto' }}>
+  <strong>InternE</strong> is a centralized platform that streamlines internship workflows at <strong>VNRVJIET</strong>.<br />
+  It allows <strong>companies</strong> to explore past internships for insights and transparency.<br />
+  <strong>Administrators</strong> can access detailed analytics and download structured Excel reports.<br />
+  <strong>Faculty</strong> can log in as guests to manage and monitor intern attendance.<br />
+  <strong>Students</strong> can submit offer letters, NOCs, approvals, and feedback, with automated email alerts every <strong>Monday and Thursday at 10 AM</strong>.
+</p>
+
+
+
   </div>
   
       <div className="hero-image ms-md-5 mt-4 mt-md-0">

@@ -38,7 +38,7 @@ function Login_ad() {
   }, []);
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#ffff' }}>
      
     
       <Header />

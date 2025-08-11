@@ -33,10 +33,7 @@ export default function Register() {
     e.preventDefault();
     const cleanedEmail = form.email.toLowerCase().trim();
 
-    if (!form.agree) {
-      setError('You must accept the agreement');
-      return;
-    }
+
     if (!cleanedEmail.endsWith('@vnrvjiet.in')) {
       setError('Email must end with @vnrvjiet.in');
       return;

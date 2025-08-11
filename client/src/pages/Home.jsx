@@ -69,7 +69,7 @@ export default function Home  () {
             <li><a href="/docs/NOC.docx" download>No Objection Certificate (NOC)</a></li>
             <li><a href="/docs/Rules.docx" download>VNR CSE Internship Rules</a></li>
             <li><a href="/docs/VNR-Bonafide-by-HOD-Template.docx" download>VNR Bonafide by HOD</a></li>
-            <li><a href="/docs/VNR Application - NOC from HOD to ....docx" download>NOC from HOD to Apply Internship</a></li>
+          
             <li><a href="/docs/VNRVJIET-Header.docx" download>VNRVJIET Header</a></li>
           </ul>
         </div>

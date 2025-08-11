@@ -49,16 +49,31 @@ export default function Profile() {
     navigate("/login");
   };
 
+  const detailsMap = [
+    { label: "Name", key: "name" },
+    { label: "Roll No", key: "rollNo" },
+    { label: "Email", key: "email" },
+    { label: "Branch", key: "branch" },
+    { label: "Semester", key: "semester" }
+  ];
+
   return (
     <div className="bg-light" style={{ fontFamily: 'Inter, sans-serif', minHeight: '100vh' }}>
       <header className="profile-header">
         <div className="logo-section d-flex justify-content-between align-items-center p-3">
           <div className="d-flex align-items-center">
-            <img src="https://imgs.search.brave.com/fdlkfHICQa7zEoIDVWVgwHT3udeRthoABe7I9X06kmo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvZW4vdGh1bWIv/ZS9lNS9PZmZpY2lh/bF9sb2dvX29mX1ZO/UlZKSUVULnBuZy8y/NTBweC1PZmZpY2lh/bF9sb2dvX29mX1ZO/UlZKSUVULnBuZw"
-              alt="VNR VJIET Logo" className="profile-logo-img" />
+            <img
+              src="https://imgs.search.brave.com/fdlkfHICQa7zEoIDVWVgwHT3udeRthoABe7I9X06kmo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvZW4vdGh1bWIv/ZS9lNS9PZmZpY2lh/bF9sb2dvX29mX1ZO/UlZKSUVULnBuZy8y/NTBweC1PZmZpY2lh/bF9sb2dvX29mX1ZO/UlZKSUVULnBuZw"
+              alt="VNR VJIET Logo"
+              className="profile-logo-img"
+            />
             <div>
-              <h2 className="gradient-text fw-bold mb-1">VNR Vignana Jyothi Institute of Engineering and Technology</h2>
-              <h5 className="fw-semibold text-light">Department of Computer Science and Engineering</h5>
+              <h2 className="gradient-text fw-bold mb-1">
+                VNR Vignana Jyothi Institute of Engineering and Technology
+              </h2>
+              <h5 className="fw-semibold text-light">
+                Department of Computer Science and Engineering
+              </h5>
             </div>
           </div>
           <button className="profile-logout-btn" onClick={handleLogout}>Logout</button>
@@ -89,20 +104,24 @@ export default function Profile() {
             </ul>
 
             <div className="tab-content">
+              {/* Details Tab */}
               <div className="tab-pane fade show active" id="details">
                 <div className="d-flex justify-content-center">
                   <div className="profile-card">
                     <h5 className="text-center text-secondary mb-4">📄 Student Details</h5>
-                    {["Name", "Roll No", "Email", "Branch", "Semester"].map((label, i) => (
+                    {detailsMap.map(({ label, key }, i) => (
                       <div key={i} className="mb-3">
                         <span className="fw-semibold text-dark">{label}:</span>
-                        <span className="ms-2">{userProfile.student?.[label.toLowerCase()] || userProfile.user?.[label.toLowerCase()]}</span>
+                        <span className="ms-2">
+                          {userProfile.student?.[key] || userProfile.user?.[key] || "—"}
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
+              {/* Internships Tab */}
               <div className="tab-pane fade" id="internships">
                 <div className="d-flex justify-content-center py-4">
                   <div className="profile-card">
@@ -113,25 +132,46 @@ export default function Profile() {
                           <p><strong>Company:</strong> {internship.organizationName}</p>
                           <p><strong>Role:</strong> {internship.role}</p>
                           <p className="text-muted">
-                            <small>{new Date(internship.startingDate).toLocaleDateString()} — {new Date(internship.endingDate).toLocaleDateString()}</small>
+                            <small>
+                              {new Date(internship.startingDate).toLocaleDateString()} — {new Date(internship.endingDate).toLocaleDateString()}
+                            </small>
                           </p>
                           <div className="d-flex flex-wrap gap-3">
-                            {["offerLetter", "applicationLetter", "noc"].map((docType) => internship[docType] && (
-                              <div key={docType} className="text-center">
-                                <div className="fw-semibold mb-1">{docType === "noc" ? "NOC" : docType.replace("Letter", " Letter")}</div>
-                                <a href={internship[docType].includes('drive.google.com') ? convertDriveLink(internship[docType]) : `http://localhost:8080${internship[docType]}`} target="_blank" rel="noopener noreferrer">
-                                  <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" alt={docType} className="profile-pdf-icon" />
-                                </a>
-                              </div>
-                            ))}
+                            {["offerLetter", "applicationLetter", "noc"].map((docType) =>
+                              internship[docType] && (
+                                <div key={docType} className="text-center">
+                                  <div className="fw-semibold mb-1">
+                                    {docType === "noc" ? "NOC" : docType.replace("Letter", " Letter")}
+                                  </div>
+                                  <a
+                                    href={
+                                      internship[docType].includes('drive.google.com')
+                                        ? convertDriveLink(internship[docType])
+                                        : `http://localhost:8080${internship[docType]}`
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg"
+                                      alt={docType}
+                                      className="profile-pdf-icon"
+                                    />
+                                  </a>
+                                </div>
+                              )
+                            )}
                           </div>
                         </div>
                       ))
-                    ) : <p className="text-center text-muted">No internships added yet.</p>}
+                    ) : (
+                      <p className="text-center text-muted">No internships added yet.</p>
+                    )}
                   </div>
                 </div>
               </div>
 
+              {/* Feedback Tab */}
               <div className="tab-pane fade" id="feedbacks">
                 <div className="d-flex justify-content-center py-4">
                   <div className="profile-card">

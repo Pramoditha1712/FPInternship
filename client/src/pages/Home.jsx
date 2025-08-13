@@ -46,6 +46,24 @@ export default function Home  () {
         <div className="text-center mb-4" >
           <h1 className="portal-title" style={{fontSize:"50px"}}>UG/PG Internship Portal</h1>
           <p className="portal-subtext">Manage your internship applications and documents with ease.</p>
+          <a
+      href="https://drive.google.com/file/d/1UBVSU94Vi9QukXg8MkDP7w9LtWh2VFiZ/view?usp=sharing"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "inline-block",
+        padding: "10px 20px",
+        background: "linear-gradient(to right, #10b981, #059669)",
+        color: "#fff",
+        borderRadius: "8px",
+        textDecoration: "none",
+        fontWeight: "500",
+        marginTop: "15px",
+        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)"
+      }}
+    >
+      🎥 Internship Portal Walkthrough
+    </a>
         </div>
         
         <img
@@ -55,6 +73,7 @@ export default function Home  () {
           style={{width:"340px"}}
         />
       </section>
+      
 
       {/* Quote */}
   

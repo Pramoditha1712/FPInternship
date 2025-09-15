@@ -9,7 +9,7 @@ import difflib
 # =========================
 # 🔧 Load Excel
 # =========================
-file_path = r"/Users/pramodithakathari/Library/CloudStorage/OneDrive-Personal/Attachments/2025-26 Internship Candidates Details form (Responses).xlsx"
+file_path = r"/Users/pramodithakathari/Desktop/2025-26 Internship Candidates Details form (Responses).xlsx"
 df = pd.read_excel(file_path, header=1)
 
 # Normalize headers

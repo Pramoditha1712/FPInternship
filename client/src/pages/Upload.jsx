@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Navbar'
 
 const Upload = () => {
+  const VITE_ADMIN_BASE_URL=import.meta.env.VITE_ADMIN_BASE_URL
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     rollNo: '',
@@ -23,7 +24,7 @@ const Upload = () => {
 
     // Fetch internship details to check end date
     try {
-      const internshipRes = await fetch(`http://localhost:8080/api/admin/roll/${formData.rollNo}`);
+      const internshipRes = await fetch(`${VITE_ADMIN_BASE_URL}/roll/${formData.rollNo}`);
       if (!internshipRes.ok) {
         alert('Could not find internship details for this roll number.');
         return;
@@ -49,7 +50,7 @@ const Upload = () => {
     console.log('Submitting feedback with data:', formData);
 
     try {
-      const response = await fetch('http://localhost:8080/api/admin/feedbacks', {
+      const response = await fetch(`${VITE_ADMIN_BASE_URL}/feedbacks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

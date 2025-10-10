@@ -7,6 +7,9 @@ import {
 } from 'recharts';
 
 const Analytics = () => {
+  const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_BASE_URL;
+  const GUEST_BASE_URL= import.meta.env.VITE_GUEST_BASE_URL;
+
   const [branchData, setBranchData] = useState([]);
   
   const [companyData, setCompanyData] = useState([]);
@@ -56,7 +59,7 @@ const Analytics = () => {
   };
   const fetchBranchAndSemesterAnalytics = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/admin/analytics', {
+      const res = await axios.get(`${ADMIN_BASE_URL}/analytics`, {
         params: {
           status: statusFilter,
           year: yearFilter,
@@ -79,7 +82,7 @@ const Analytics = () => {
 
 const fetchYearlyAnalytics = async () => {
   try {
-    const res = await axios.get('http://localhost:8080/api/admin/yearly-analytics', {
+    const res = await axios.get(`${ADMIN_BASE_URL}/yearly-analytics`, {
       params: {
         year: yearFilter
       }

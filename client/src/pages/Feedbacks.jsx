@@ -5,12 +5,13 @@ import Header from '../components/Navbar'
 import './Feedbacks.css'
 
 const Feedbacks = () => {
+  const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_BASE_URL;
   const [feedbacks, setFeedbacks] = useState([]);
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/admin/feedbacks');
+        const res = await axios.get(`${ADMIN_BASE_URL}/feedbacks`);
         // Ensure it's always an array
         setFeedbacks(Array.isArray(res.data) ? res.data : []);
       } catch (error) {

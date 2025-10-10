@@ -6,7 +6,7 @@ const Feedback = require('../models/Feedback');
 
 // Middleware to verify JWT token
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'your_jwt_secret_key'; // Use process.env.JWT_SECRET in production
+const JWT_SECRET = process.env.JWT_SECRET; // Use process.env.JWT_SECRET in production
 
 const verifyApiKey = async (req, res, next) => {
   const authHeader = req.header('Authorization');

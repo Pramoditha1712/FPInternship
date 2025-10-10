@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginGuest = () => {
+  const VITE_GUEST_BASE_URL=import.meta.env.VITE_GUEST_BASE_URL
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +14,7 @@ const LoginGuest = () => {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:8080/guest/login', { name, password });
+      const res = await axios.post(`${VITE_GUEST_BASE_URL}/login`, { name, password });
       if (res.data.token) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userRole', 'guest');

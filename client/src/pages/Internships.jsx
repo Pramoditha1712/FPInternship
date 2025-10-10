@@ -55,6 +55,13 @@
       return companyAliasMap[trimmedName] || trimmedName;
     };
     const Internships = () => {
+      const VITE_ADMIN_BASE_URL=import.meta.env.VITE_ADMIN_BASE_URL
+      const VITE_INTERNSHIP_BASE_URL=import.meta.env.VITE_INTERNSHIP_BASE_URL
+      const VITE_AUTH_BASE_URL=import.meta.env.VITE_AUTH_BASE_URL
+      const VITE_GUEST_BASE_URL=import.meta.env.VITE_GUEST_BASE_URL
+      const VITE_ORG_BASE_URL=import.meta.env.VITE_ORG_BASE_URL
+      const VITE_USER_BASE_URL=import.meta.env.VITE_USER_BASE_URL
+      const VITE_BACKEND_URL=import.meta.env.VITE_BACKEND_URL
       const [internships, setInternships] = useState([]);
       const [filters, setFilters] = useState({
         type: "",
@@ -88,7 +95,7 @@
       const toggleFilters = () => {
         setShowFilters(!showFilters);
       };
-      const BACKEND_URL = "http://localhost:8080";
+      
       const convertDriveLink = (url) => {
         if (!url) return null;
         const match = url.match(/[-\w]{25,}/);
@@ -143,7 +150,7 @@
       const fetchInternships = async () => {
         const query = buildQuery();
         try {
-          const res = await axios.get(`http://localhost:8080/api/admin/internships/filter?${query}`);
+          const res = await axios.get(`${VITE_ADMIN_BASE_URL}/internships/filter?${query}`);
           setInternships(Array.isArray(res.data) ? res.data : res.data.internships || []);
         } catch (err) {
           console.error("Error fetching internships:", err);
@@ -185,7 +192,7 @@
       if (!window.confirm("Are you sure you want to delete this internship?")) return;
 
       try {
-        await axios.delete(`${BACKEND_URL}/api/admin/internships/${id}`);
+        await axios.delete(`${VITE_ADMIN_BASE_URL}internships/${id}`);
         setInternships(prev => prev.filter(i => i._id !== id));
       } catch (error) {
         console.error("Error deleting internship:", error);
@@ -430,7 +437,7 @@
                             href={
                               i.applicationLetter.includes("drive.google.com")
                                 ? convertDriveLink(i.applicationLetter)
-                                : `${BACKEND_URL}${i.applicationLetter}`
+                                : `${VITE_BACKEND_URL}${i.applicationLetter}`
                             }
                             target="_blank"
                             rel="noreferrer"
@@ -443,7 +450,7 @@
                               href={
                                 i.offerLetter.includes("drive.google.com")
                                   ? convertDriveLink(i.offerLetter)
-                                  : `${BACKEND_URL}${i.offerLetter}`
+                                  : `${VITE_BACKEND_URL}${i.offerLetter}`
                               }
                               target="_blank"
                               rel="noreferrer"
@@ -456,7 +463,7 @@
                               href={
                                 i.noc.includes("drive.google.com")
                                   ? convertDriveLink(i.noc)
-                                  : `${BACKEND_URL}${i.noc}`
+                                  : `${VITE_BACKEND_URL}${i.noc}`
                               }
                               target="_blank"
                               rel="noreferrer"

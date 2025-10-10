@@ -150,6 +150,8 @@ const ExpandIcon = styled.span`
 
 // ========== Helper Functions ==========
 const groupStudentsBySemesterAsYear = (students) => {
+
+  
   const grouped = {};
   const romanToNumber = { I: 1, II: 2, III: 3, IV: 4 };
   students.forEach(student => {
@@ -182,6 +184,7 @@ const groupStudentsBySemesterAsYear = (students) => {
 
 // ========== Main Component ==========
 const GuestDashboard = () => {
+  const VITE_GUEST_BASE_URL=import.meta.env.VITE_GUEST_BASE_URL;
   const [categorizedData, setCategorizedData] = useState({});
   const [selectedBranch, setSelectedBranch] = useState('');
   const [selectedSection, setSelectedSection] = useState('');
@@ -193,7 +196,7 @@ const GuestDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/guest/guest-dashboard');
+        const res = await axios.get(`${VITE_GUEST_BASE_URL}/guest-dashboard`);
         setCategorizedData(res.data.categorized || {});
       } catch (err) {
         console.error('Error fetching dashboard data:', err);

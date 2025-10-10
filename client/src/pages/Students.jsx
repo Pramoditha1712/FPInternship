@@ -4,6 +4,7 @@ import "./Pages.css";
 import Header from "../components/Navbar";
 
 const Students = () => {
+  const VITE_ADMIN_BASE_URL=import.meta.env.VITE_ADMIN_BASE_URL
   const [students, setStudents] = useState([]);
   const [filters, setFilters] = useState({
     semester: "",
@@ -23,7 +24,7 @@ const Students = () => {
   const fetchStudents = async () => {
     try {
       const query = new URLSearchParams(filters).toString();
-      const res = await axios.get(`http://localhost:8080/api/admin/Users?${query}`);
+      const res = await axios.get(`${VITE_ADMIN_BASE_URL}/Users?${query}`);
       setStudents(res.data);
       console.log("Students data:", res.data);
     } catch (error) {
@@ -41,7 +42,7 @@ const Students = () => {
 
   const openModal = async (rollNo) => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/admin/roll/${rollNo}`);
+      const res = await axios.get(`${VITE_ADMIN_BASE_URL}/roll/${rollNo}`);
       setSelectedStudent(res.data);
       console.log(res.data)
       setShowModal(true);
@@ -67,7 +68,7 @@ const handleEditChange = (e) => {
 
 const handleEditSubmit = async () => {
   try {
-    await axios.put(`http://localhost:8080/api/admin/roll/${selectedStudent.rollNo}`, editForm);
+    await axios.put(`${VITE_ADMIN_BASE_URL}/roll/${selectedStudent.rollNo}`, editForm);
     setEditModal(false);
     fetchStudents(); // refresh data
   } catch (err) {

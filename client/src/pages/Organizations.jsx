@@ -3,6 +3,7 @@
   import Header from '../components/Navbar';
   import './Organizations.css'
   const Organizations = () => {
+    const VITE_ORG_BASE_URL=import.meta.env.VITE_ORG_BASE_URL
     const [organizations, setOrganizations] = useState([]);
     const [newOrgName, setNewOrgName] = useState('');
     const [error, setError] = useState('');
@@ -13,7 +14,7 @@
 
     const fetchOrganizations = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/organization');
+        const res = await axios.get(`${VITE_ORG_BASE_URL}`);
         setOrganizations(res.data || []);
         console.log(res.data)
       
@@ -25,7 +26,7 @@
     const handleAddOrganization = async () => {
       if (!newOrgName.trim()) return;
       try {
-        const res = await axios.post('http://localhost:8080/api/organization', {
+        const res = await axios.post(`${VITE_ORG_BASE_URL}`, {
           name: newOrgName.trim(),
         });
         setOrganizations([...organizations, res.data]);
@@ -39,7 +40,7 @@
 
     const handleDelete = async (id) => {
       try {
-        await axios.delete(`http://localhost:8080/api/organization/${id}`);
+        await axios.delete(`${VITE_ORG_BASE_URL}/${id}`);
         setOrganizations(organizations.filter((org) => org._id !== id));
       } catch (err) {
         console.error('Error deleting organization:', err);

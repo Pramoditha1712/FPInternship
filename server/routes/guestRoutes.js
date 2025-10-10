@@ -5,7 +5,8 @@ const Admin = require('../models/Admin');
 const User = require('../models/User');
 const Internship = require('../models/Internship');
 
-const JWT_SECRET = 'your_jwt_secret_key'; // Use environment variable in production
+const JWT_SECRET = process.env.JWT_SECRET;
+
 
 // Guest login route
 router.post('/login', async (req, res) => {

@@ -9,8 +9,8 @@ import difflib
 # =========================
 # 🔧 Load Excel
 # =========================
-file_path = r"/Users/pramodithakathari/Desktop/2025-26 Internship Candidates Details form (Responses).xlsx"
-df = pd.read_excel(file_path, header=1)
+file_path = r"/Users/pramodithakathari/Desktop/2025-26 Internship Candidates Details form (Responses) (1).xlsx"
+df = pd.read_excel(file_path,header=1)
 
 # Normalize headers
 df.columns = (
@@ -21,9 +21,11 @@ df.columns = (
     .str.replace('"', "", regex=False)
 )
 
-# Column resolver
+# =========================
+# 🧠 Column Resolver
+# =========================
 def resolve_column(name, df_columns):
-    matches = difflib.get_close_matches(name, df_columns, n=1, cutoff=0.6)
+    matches = difflib.get_close_matches(name, df_columns, n=1, cutoff=0.3)
     return matches[0] if matches else None
 
 COLS = {
@@ -47,13 +49,22 @@ COLS = {
     "noc": resolve_column("NOC by HoD to student - RollNo_inoc.pdf Example - 22071A0508_inoc.pdf", df.columns),
 }
 
-# MongoDB
+# Debug print to verify columns
+print("Resolved Columns:")
+for k, v in COLS.items():
+    print(f"{k:10} → {v}")
+
+# =========================
+# ⚙️ MongoDB Setup
+# =========================
 client = MongoClient("mongodb://localhost:27017")
 db = client["internship"]
 users_collection = db["users"]
 internships_collection = db["internships"]
 
-# Helpers
+# =========================
+# 🧰 Helper Functions
+# =========================
 def get_safe_value(row, key, default=None):
     col = COLS.get(key)
     if not col or col not in row:
@@ -83,16 +94,30 @@ def parse_date(value):
         except:
             return None
 
-# Clean users
-df_cleaned = df.dropna(subset=[COLS["roll"], COLS["name"], COLS["email"]])
+# =========================
+# 🧹 Clean Users
+# =========================
+required_cols = [COLS["roll"], COLS["name"], COLS["email"]]
+required_cols = [c for c in required_cols if c]
+
+if not required_cols:
+    print("❌ No valid columns found for roll, name, or email. Please check your Excel headers.")
+    print("Columns in Excel:", df.columns.tolist())
+    exit()
+
+df_cleaned = df.dropna(subset=required_cols)
 df_cleaned = df_cleaned[df_cleaned[COLS["roll"]].astype(str).str.strip() != ""]
 df_users = df_cleaned.drop_duplicates(subset=COLS["roll"])
 
-# Hashed password
+# =========================
+# 🔐 User Password Setup
+# =========================
 default_password = "vnrvjiet"
 hashed_password = bcrypt.hashpw(default_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-# Users
+# =========================
+# 👤 Prepare Users
+# =========================
 users_all = []
 for _, row in df_users.iterrows():
     roll = get_safe_value(row, "roll")
@@ -109,25 +134,32 @@ for _, row in df_users.iterrows():
         "role": "student"
     })
 
-# Insert users without duplicates
-existing_rolls = set(x.get("rollNo") for x in users_collection.find({}, {"rollNo":1}))
-existing_emails = set(x.get("email") for x in users_collection.find({}, {"email":1}))
+# =========================
+# 🧾 Insert Users (avoid duplicates)
+# =========================
+existing_rolls = set(x.get("rollNo") for x in users_collection.find({}, {"rollNo": 1}))
+existing_emails = set(x.get("email") for x in users_collection.find({}, {"email": 1}))
 users_to_insert = [u for u in users_all if u["rollNo"] not in existing_rolls and u["email"] not in existing_emails]
+
 if users_to_insert:
     users_collection.insert_many(users_to_insert)
-    print(f"✅ Inserted {len(users_to_insert)} users.")
+    print(f"✅ Inserted {len(users_to_insert)} new users.")
+else:
+    print("ℹ️ No new users to insert.")
 
-# Internships with overlap check
+# =========================
+# 🏢 Prepare Internships
+# =========================
 internships_all = []
 for _, row in df_cleaned.iterrows():
     roll = get_safe_value(row, "roll")
     if not roll:
         continue
-    
+
     start = parse_date(get_safe_value(row, "start"))
     end = parse_date(get_safe_value(row, "end"))
-    
-    # Check existing internships for overlap
+
+    # Overlap check
     existing_interns = internships_collection.find({"rollNo": roll})
     for intern in existing_interns:
         ex_start = intern.get("startingDate")
@@ -136,7 +168,7 @@ for _, row in df_cleaned.iterrows():
             overlap = max(start, ex_start) <= min(end, ex_end)
             if overlap:
                 print(f"⚠️ Overlapping internship detected for {roll}: {get_safe_value(row, 'org')} overlaps with {intern.get('organizationName')}")
-    
+
     internships_all.append({
         "internshipID": str(uuid.uuid4()),
         "rollNo": roll,
@@ -158,6 +190,11 @@ for _, row in df_cleaned.iterrows():
         "status": "Pending"
     })
 
+# =========================
+# 📤 Insert Internships
+# =========================
 if internships_all:
     internships_collection.insert_many(internships_all)
     print(f"✅ Inserted {len(internships_all)} internships.")
+else:
+    print("ℹ️ No internships to insert.")

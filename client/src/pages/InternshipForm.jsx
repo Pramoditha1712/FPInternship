@@ -4,6 +4,8 @@ import "./InternshipForm.css";
 import Header from "../components/Navbar";
 
 function InternshipForm() {
+  const VITE_ORG_BASE_URL=import.meta.env.VITE_ADMIN_BASE_URL;
+  const  VITE_INTERNSHIP_BASE_URL = import.meta.env.VITE_INTERNSHIP_BASE_URL;
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -35,7 +37,7 @@ function InternshipForm() {
   useEffect(() => {
   const fetchOrganizations = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/organization");
+      const res = await fetch(`${VITE_ORG_BASE_URL}`);
       const data = await res.json();
       console.log("Fetched organizations from API:", data); // ✅ This confirms fetch worked
       setOrganizations(data); // ✅ This sets the state
@@ -158,7 +160,7 @@ useEffect(() => {
     if (renamedNocFile) form.append("noc", renamedNocFile);
 
     try {
-      const res = await fetch("http://localhost:8080/api/internships/submit", {
+      const res = await fetch(`${VITE_INTERNSHIP_BASE_URL}/submit`, {
         method: "POST",
         body: form
       });

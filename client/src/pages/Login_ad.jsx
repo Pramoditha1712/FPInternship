@@ -7,6 +7,7 @@ import Header from '../components/Navbar';
 import './Login_ad.css'
 import feather from 'feather-icons';
 function Login_ad() {
+  const VITE_ADMIN_BASE_URL=import.meta.env.VITE_ADMIN_BASE_URL
   const [adminID, setAdminID] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,7 +16,7 @@ function Login_ad() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/api/admin/login', {
+      const response = await axios.post(`${VITE_ADMIN_BASE_URL}/login`, {
         adminID,
         password
       }, {

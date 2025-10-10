@@ -7,6 +7,7 @@ import ProfilePic from '../assets/profile.svg';
 import './Profile.css';
 
 export default function Profile() {
+  const VITE_USER_BASE_URL=import.meta.env.VITE_USER_BASE_URL
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ export default function Profile() {
         setLoading(false);
         return;
       }
-      const res = await axios.get('http://localhost:8080/api/user/profile', {
+      const res = await axios.get(`${VITE_USER_BASE_URL}/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUserProfile(res.data);
@@ -147,7 +148,7 @@ export default function Profile() {
                                     href={
                                       internship[docType].includes('drive.google.com')
                                         ? convertDriveLink(internship[docType])
-                                        : `http://localhost:8080${internship[docType]}`
+                                        : `http://localhost:6131${internship[docType]}`
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"

@@ -1,28 +1,21 @@
-// utils/reminderEmailService.js
-
 const Internship = require('../models/Internship');
 const Feedback = require('../models/Feedback');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-// Configure email transporter (Gmail example)
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'abc@gmail.com',      // replace with your email
-    pass: 'zoswqkavjbtzsqjv' // use app password if 2FA enabled
+    user: process.env.ADMIN_EMAIL,
+    pass: process.env.ADMIN_PASSWORD
   }
 });
 
 async function sendFeedbackEmailReminders() {
   const today = new Date();
-
-  const internships = await Internship.find({
-    endingDate: { $lte: today }
-  });
-
+  const internships = await Internship.find({ endingDate: { $lte: today } });
   const feedbacks = await Feedback.find({});
-
   const remindersSent = [];
 
   for (let internship of internships) {
@@ -36,7 +29,7 @@ async function sendFeedbackEmailReminders() {
       if (!user) continue;
 
       const mailOptions = {
-        from: 'sarikareddyanikalla178@gmail.com',
+        from: process.env.ADMIN_EMAIL,
         to: user.email,
         subject: 'Feedback Reminder for Internship',
         text: `Hi ${user.name},
@@ -54,8 +47,9 @@ Internship Cell`
       try {
         await transporter.sendMail(mailOptions);
         remindersSent.push({ email: user.email, name: user.name });
+        console.log(`✅ Feedback reminder sent to ${user.email}`);
       } catch (err) {
-        console.error(`Error sending to ${user.email}:`, err.message);
+        console.error(`❌ Error sending to ${user.email}:`, err.message);
       }
     }
   }

@@ -1,14 +1,15 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Admin = require('./models/Admin');
 
-const adminID = 'A1';
-const name = 'Admin User';
-const email = 'admin@example.com';
-const phoneNo = 1234567890;
-const department = 'IT';
-const password = 'Sarika@123'; // Plain text password
+const adminID = process.env.ADMIN_ID;
+const name = process.env.ADMIN_NAME;
+const email = process.env.ADMIN_EMAIL;
+const phoneNo = process.env.ADMIN_PHONE;
+const department = process.env.ADMIN_DEPT;
+const password = process.env.ADMIN_PASSWORD;
 
-mongoose.connect('mongodb://127.0.0.1:27017/inter', {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(async () => {
@@ -26,7 +27,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/inter', {
     email,
     phoneNo,
     department,
-    password,
+    password, 
   });
 
   await newAdmin.save();

@@ -20,7 +20,6 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3131',  // local frontend
   'https://www.cseinterns.vjstartup.com', // deployed frontend
-  'http://192.168.29.185:3131',
   'https://hub.vjstartup.com',   
   
 ];

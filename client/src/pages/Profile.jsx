@@ -8,6 +8,7 @@ import './Profile.css';
 
 export default function Profile() {
   const VITE_USER_BASE_URL=import.meta.env.VITE_USER_BASE_URL
+  const VITE_BACKEND_URL=import.meta.env.VITE_BACKEND_URL
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -148,7 +149,7 @@ export default function Profile() {
                                     href={
                                       internship[docType].includes('drive.google.com')
                                         ? convertDriveLink(internship[docType])
-                                        : `http://localhost:6131${internship[docType]}`
+                                        : `${VITE_BACKEND_URL}${internship[docType]}`
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"

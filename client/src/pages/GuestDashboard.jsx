@@ -334,7 +334,6 @@ const GuestDashboard = () => {
                       <tr>
                         <th>Name</th>
                         <th>Roll No</th>
-                        <th>Email</th>
                         <th>Organization</th>
                       </tr>
                     </thead>
@@ -343,7 +342,6 @@ const GuestDashboard = () => {
                         <tr key={s._id}>
                           <td>{s.name}</td>
                           <td>{s.rollNo}</td>
-                          <td>{s.email}</td>
                           <td>{s.organizationName}</td>
                         </tr>
                       ))}

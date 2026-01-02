@@ -8,6 +8,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { normalizeCompanyName } = require('../service/helper');
 
+// Converts DB Date object into intended DD/MM interpretation
+
+
+
 // Basic test route for admin
 router.get('/', async (req, res) => {
   try {
@@ -18,129 +22,168 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Filter internships with query params including company acronym matching
-router.get('/internships/filter', async (req, res) => {
-  const {
-    type,
-    semester,
-    section,
-    branch,
-    year,        // start year
-    month,       // start month
-    endYear,     // end year
-    endMonth,    // end month
-    company
-  } = req.query;
-
-  const today = new Date();
-
-  const knownBranches = ["CSE", "CSBS"];
-
-  const matchesAcronym = (query, name) => {
-    const acronym = name
-      .split(/\s+/)
-      .map(word => word[0].toUpperCase())
-      .join('');
-    return acronym.includes(query.toUpperCase());
-  };
-
+router.get('/internships/academic-years', async (req, res) => {
   try {
-    let dateQuery = {};
+    const internships = await Internship.find(
+      { startingDate: { $exists: true, $ne: null } },
+      { startingDate: 1 }
+    );
 
-    // 🔹 Add status-based filtering
-    if (type === 'ongoing') {
-      dateQuery = {
-        startingDate: { $lte: today },
-        endingDate: { $gte: today }
-      };
-    } else if (type === 'past') {
-      dateQuery = {
-        endingDate: { $lt: today }
-      };
-    } else if (type === 'future') {
-      dateQuery = {
-        startingDate: { $gt: today }
-      };
-    }
+    const yearSet = new Set();
 
-    // 🔹 Fetch all internships based on type filter
-    let internships = await Internship.find(dateQuery);
+    internships.forEach(i => {
+      const date = new Date(i.startingDate);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
 
-    // 🔹 Apply start date range (FROM)
-    if (year && month) {
-      const fromDate = new Date(Number(year), Number(month) - 1, 1);
-      internships = internships.filter(i => new Date(i.startingDate) >= fromDate);
-    }
+      // June–Dec → same year
+      // Jan–May → previous year
+      const academicStartYear = month >= 6 ? year : year - 1;
 
-    // 🔹 Apply end date range (TO)
-    if (endYear && endMonth) {
-      const toDate = new Date(Number(endYear), Number(endMonth), 0); // last day of end month
-      internships = internships.filter(i => new Date(i.startingDate) <= toDate);
-    }
-
-
-
-    // 🔹 Filter by company name or acronym
-    if (company) {
-      const regex = new RegExp(company, 'i');
-      internships = internships.filter(i =>
-        regex.test(i.organizationName) || matchesAcronym(company, i.organizationName)
-      );
-    }
-
-    // 🔹 Fetch all students
-    let students = await User.find();
-
-    // 🔹 Apply student filters
-    if (semester) {
-      students = students.filter(s => s.semester === semester);
-    }
-
-    if (branch) {
-      if (branch === "Other") {
-        students = students.filter(s => !knownBranches.includes(s.branch));
-      } else {
-        students = students.filter(s => s.branch === branch);
-      }
-    }
-
-    if (section) {
-      students = students.filter(s => s.section === section);
-    }
-
-    // 🔹 Build rollNo map for quick lookup
-    const studentMap = {};
-    students.forEach(s => {
-      studentMap[s.rollNo] = s;
+      yearSet.add(academicStartYear);
     });
 
-    // 🔹 Final matching
-    const filteredInternships = internships
-      .filter(i => studentMap[i.rollNo])
-      .map(i => {
-        const student = studentMap[i.rollNo];
+    const result = [...yearSet]
+      .sort()
+      .map(y => ({
+        label: `${y}-${(y + 1).toString().slice(-2)}`,
+        value: y
+      }));
+
+    res.json(result);
+  } catch (err) {
+    console.error('Academic years error:', err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+
+router.get("/internships/filter", async (req, res) => {
+  try {
+    const {
+      type,
+      semester,
+      section,
+      branch,
+      year,
+      month,
+      endYear,
+      endMonth,
+      company,
+    } = req.query;
+
+    const today = new Date();
+    const mongoQuery = {};
+
+    // ---------------- STATUS FILTER ----------------
+    if (type === "ongoing") {
+      mongoQuery.startingDate = { $lte: today };
+      mongoQuery.endingDate = { $gte: today };
+    } else if (type === "past") {
+      mongoQuery.endingDate = { $lt: today };
+    } else if (type === "future") {
+      mongoQuery.startingDate = { $gt: today };
+    }
+
+// ---------------- ACADEMIC YEAR + MONTH FILTER (SAFE) ----------------
+
+// ---------------- ACADEMIC YEAR + MONTH FILTER (NON-CONFLICTING) ----------------
+if (req.query.year && req.query.year !== "") {
+  const academicStartYear = parseInt(req.query.year, 10);
+
+  if (!Number.isNaN(academicStartYear)) {
+    let rangeStart;
+    let rangeEnd;
+
+    if (req.query.month && req.query.month !== "") {
+      const m = parseInt(req.query.month, 10);
+      if (!Number.isNaN(m)) {
+
+        // 🔑 decide correct calendar year
+        const calendarYear = m >= 6
+          ? academicStartYear        // Jun–Dec
+          : academicStartYear + 1;   // Jan–May
+
+        rangeStart = new Date(calendarYear, m - 1, 1);
+        rangeEnd   = new Date(calendarYear, m, 0);
+      }
+    } else {
+      // Full academic year: June → May
+      rangeStart = new Date(academicStartYear, 5, 1);      // June 1, 2025
+      rangeEnd   = new Date(academicStartYear + 1, 4, 31); // May 31, 2026
+    }
+
+    if (rangeStart && rangeEnd) {
+      mongoQuery.$and = mongoQuery.$and || [];
+      mongoQuery.$and.push({
+        startingDate: {
+          $gte: rangeStart,
+          $lte: rangeEnd
+        }
+      });
+    }
+  }
+}
+
+
+
+    // ---------------- COMPANY FILTER ----------------
+    if (company) {
+      mongoQuery.organizationName = new RegExp(company, "i");
+    }
+
+    console.log("Final Mongo Query:", JSON.stringify(mongoQuery, null, 2));
+
+    const internships = await Internship.find(mongoQuery).lean();
+    
+
+  
+
+    // ---------------- STUDENT FILTER ----------------
+    const knownBranches = ["CSE", "CSBS"];
+    const studentFilter = {};
+
+    if (semester) studentFilter.semester = semester;
+    if (section) studentFilter.section = section;
+
+    if (branch) {
+      studentFilter.branch =
+        branch === "Other" ? { $nin: knownBranches } : branch;
+    }
+
+    const students = await User.find(studentFilter);
+    const studentMap = {};
+    students.forEach((s) => (studentMap[s.rollNo] = s));
+
+    // ---------------- FINAL RESPONSE ----------------
+    const final = internships
+      .filter((i) => studentMap[i.rollNo])
+      .map((i) => {
+        const st = studentMap[i.rollNo];
         const start = new Date(i.startingDate);
         const end = new Date(i.endingDate);
-        let status = "";
 
-        if (today < start) status = "future";
-        else if (today > end) status = "past";
-        else status = "ongoing";
+        let status =
+          today < start ? "future" : today > end ? "past" : "ongoing";
 
         return {
-          ...i.toObject(),
+          ...i,
           status,
-          semester: student.semester || null,
-          branch: student.branch || null,
-          section: student.section || null
+          semester: st.semester,
+          branch: st.branch,
+          section: st.section,
         };
       });
 
-    res.json(filteredInternships);
+    res.json(final);
   } catch (err) {
+    console.error("Filter Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
 
 // Update internship status
 router.patch('/internships/:id/status', async (req, res) => {
@@ -158,12 +201,16 @@ router.patch('/internships/:id/status', async (req, res) => {
 // Get Users with optional semester and section filters
 router.get('/Users', async (req, res) => {
   try {
-    const { semester, branch, section } = req.query;
+    const { name, semester, branch, section } = req.query;
 
     const query = {};
+    if (name) {
+      query.name = { $regex: name, $options: "i" };
+    }
+    
     if (semester) query.semester = semester;
 
-    const knownBranches = ["CSE", "IT", "ECE", "EEE", "MECH", "CIVIL", "AI&ML", "AI&DS", "CSBS", "IoT", "AIDS"];
+    const knownBranches = ["CSE", "CSBS"];
     if (branch) {
       if (branch === "OTHER") {
         query.branch = { $nin: knownBranches };
@@ -286,73 +333,81 @@ router.post('/feedbacks', async (req, res) => {
 // Analytics route: branch & semester counts for internships with optional filters
 router.get('/analytics', async (req, res) => {
   try {
-    const { status, year, section } = req.query;
+    const { status, academicYear, section } = req.query;
 
     const internships = await Internship.find();
     const users = await User.find();
 
     const userMap = {};
-    users.forEach((u) => {
+    users.forEach(u => {
       if (u.rollNo) {
         userMap[u.rollNo.toUpperCase().trim()] = u;
       }
     });
 
     const today = new Date();
-
     const knownBranches = ["CSE", "CSBS"];
     const branchCounts = {};
     const semesterCounts = {};
 
-    // Initialize counts to 0
-    knownBranches.forEach(b => branchCounts[b] = 0);
-    // branchCounts["Other"] = 0;
+    knownBranches.forEach(b => (branchCounts[b] = 0));
+    for (let i = 1; i <= 8; i++) semesterCounts[i] = 0;
 
-    for (let i = 1; i <= 8; i++) {
-      semesterCounts[i.toString()] = 0;
+    // ✅ Academic year window
+    let academicStart = null;
+    let academicEnd = null;
+
+    if (academicYear) {
+      const [startYear, endYY] = academicYear.split("-");
+      const endYear = Number(`20${endYY}`);
+
+      academicStart = new Date(`${startYear}-06-01T00:00:00.000Z`);
+      academicEnd = new Date(`${endYear}-05-31T23:59:59.999Z`);
     }
 
-    const filtered = internships.filter((i) => {
+    internships.forEach(i => {
       const roll = i.rollNo?.toUpperCase().trim();
       const user = userMap[roll];
-      if (!user) return false;
+      if (!user) return;
 
       const start = new Date(i.startingDate);
       const end = new Date(i.endingDate);
 
+      // ✅ Status filter
       let internshipStatus = "";
       if (today < start) internshipStatus = "future";
       else if (today > end) internshipStatus = "past";
       else internshipStatus = "ongoing";
 
-      if (status && status !== "all" && internshipStatus !== status) return false;
-      if (year && start.getFullYear().toString() !== year) return false;
-      if (section && user.section !== section) return false;
+      if (status !== "all" && status && internshipStatus !== status) return;
+      if (section && user.section !== section) return;
 
-      // Collect into counts
-      const branch = user.branch || "Unknown";
-      const semester = user.semester || "Unknown";
+      // ✅ Academic year filter (FIX)
+      if (academicStart && academicEnd) {
+        if (start < academicStart || start > academicEnd) return;
+      }
+
+      const branch = user.branch;
+      const semester = user.semester;
 
       if (knownBranches.includes(branch)) {
         branchCounts[branch]++;
       }
-      //  else {
-      //   branchCounts["Other"]++;
-      // }
 
-      if (semester in semesterCounts) {
+      if (semesterCounts[semester] !== undefined) {
         semesterCounts[semester]++;
-      } else {
-        semesterCounts[semester] = 1;
       }
-
-      return true;
     });
 
     res.json({
-      year: year || "All Years",
-      branchData: Object.entries(branchCounts).map(([branch, count]) => ({ branch, count })),
-      semesterData: Object.entries(semesterCounts).map(([semester, count]) => ({ semester, count }))
+      branchData: Object.entries(branchCounts).map(([branch, count]) => ({
+        branch,
+        count
+      })),
+      semesterData: Object.entries(semesterCounts).map(([semester, count]) => ({
+        semester,
+        count
+      }))
     });
 
   } catch (err) {
@@ -361,42 +416,66 @@ router.get('/analytics', async (req, res) => {
   }
 });
 
+function getAcademicYearFromMongoDate(dbDate) {
+  if (!(dbDate instanceof Date) || isNaN(dbDate)) return null;
 
+  const year = dbDate.getFullYear();
+  const month = dbDate.getMonth() + 1; // 1 = Jan, 7 = July
+
+  // June (6) to December (12) → currentYear-nextYear
+  if (month >= 6) {
+    return `${year}-${(year + 1).toString().slice(-2)}`;
+  }
+
+  // January (1) to May (5) → previousYear-currentYear
+  return `${year - 1}-${year.toString().slice(-2)}`;
+}
 router.get('/yearly-analytics', async (req, res) => {
-  const allYears = [2023, 2024, 2025, 2026];
-  const result = [];
-
-  // Fetch Company Counts
-  const internships = await Internship.find({ startingDate: { $exists: true } });
-  const companyMap = {}; // { year: Set of normalized company names }
-
-  internships.forEach(doc => {
-    const yr = new Date(doc.startingDate).getFullYear();
-    const normName = normalizeCompanyName(doc.organizationName);
-    if (!companyMap[yr]) companyMap[yr] = new Set();
-    if (normName) companyMap[yr].add(normName);
-  });
-
-  // Fetch Students Count per Year
-  const studentMap = {}; // { year: count of students placed }
-
-  internships.forEach(doc => {
-    const yr = new Date(doc.startingDate).getFullYear();
-    if (!studentMap[yr]) studentMap[yr] = new Set();
-    studentMap[yr].add(doc.rollNo); // To avoid duplicates
-  });
-
-  // Prepare Response
-  allYears.forEach(yr => {
-    result.push({
-      year: yr,
-      students: studentMap[yr] ? studentMap[yr].size : 0,
-      companies: companyMap[yr] ? companyMap[yr].size : 0
+  try {
+    const internships = await Internship.find({
+      startingDate: { $exists: true, $ne: null }
     });
-  });
 
-  res.json(result);
+    const analytics = {};
+
+    internships.forEach(doc => {
+      const academicYear = getAcademicYearFromMongoDate(doc.startingDate);
+      if (!academicYear) return;
+
+      if (!analytics[academicYear]) {
+        analytics[academicYear] = {
+          students: new Set(),
+          companies: new Set()
+        };
+      }
+
+      if (doc.rollNo) {
+        analytics[academicYear].students.add(doc.rollNo);
+      }
+
+      if (doc.organizationName) {
+        const norm = normalizeCompanyName(doc.organizationName);
+        if (norm) analytics[academicYear].companies.add(norm);
+      }
+    });
+
+    const result = Object.keys(analytics)
+      .sort()
+      .map(year => ({
+        academicYear: year,
+        students: analytics[year].students.size,
+        companies: analytics[year].companies.size
+      }));
+
+    res.json(result);
+
+  } catch (err) {
+    console.error("Yearly Analytics Error:", err);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
+
+
 
 
 // Get User + their internships by roll number
@@ -515,5 +594,8 @@ router.get('/remind-feedback', async (req, res) => {
     res.status(500).json({ error: 'Failed to send reminders.' });
   }
 });
+
+
+
 
 module.exports = router;

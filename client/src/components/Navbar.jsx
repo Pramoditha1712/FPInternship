@@ -1,5 +1,6 @@
 import './Navbar.css'
 import React from 'react';
+import vnrImage from '../assets/vnrImage.webp'
  // Optional: move header-specific CSS here
 
 const Header = () => {
@@ -7,7 +8,7 @@ const Header = () => {
     <header className="header">
       <div className="logo-section">
         <img
-          src="https://imgs.search.brave.com/fdlkfHICQa7zEoIDVWVgwHT3udeRthoABe7I9X06kmo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvZW4vdGh1bWIv/ZS9lNS9PZmZpY2lh/bF9sb2dvX29mX1ZO/UlZKSUVULnBuZy8y/NTBweC1PZmZpY2lh/bF9sb2dvX29mX1ZO/UlZKSUVULnBuZw"
+          src={vnrImage}
           alt="VNR VJIET Logo"
           className="logo-img"
         />

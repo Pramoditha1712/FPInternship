@@ -5,12 +5,14 @@
     import { saveAs } from "file-saver";
     import "./Internship.css"; 
 
+
     const companyAliasMap = {
       "jpmorgan chase": "JPMC",
       "jp morgan chase": "JPMC",
       "jpmorgan chase & co.": "JPMC",
       "jpmorgan chase and co": "JPMC",
       "jpmorgan chase & co": "JPMC",
+      "jp morgan chase & co.":"JPMC",
       "jpmorgan and chase": "JPMC",
       "jp morgan chase and co":"JPMC",
       "jpmc": "JPMC",
@@ -48,6 +50,12 @@
       "drdo": "DRDO"
       
     };
+    /* ===== PAGINATION (ADDED) ===== */
+    const ITEMS_PER_PAGE = 7;
+  
+    /* ============================= */
+
+    
     
     const normalizeCompanyName = (name) => {
       if (!name) return "";
@@ -77,6 +85,8 @@
       const [showFilters, setShowFilters] = useState(false);
       const [showExportModal, setShowExportModal] = useState(false);
       const [selectedFields, setSelectedFields] = useState([]);
+      const [academicYears, setAcademicYears] = useState([]);
+
       const exportableFields = [
       { key: "rollNo", label: "Roll No" },
       { key: "organizationName", label: "Organization" },
@@ -92,27 +102,59 @@
       { key: "hrPhone", label: "HR Phone" },
     ];
 
+    useEffect(() => {
+      const fetchAcademicYears = async () => {
+        try {
+          const res = await axios.get(
+            `${VITE_ADMIN_BASE_URL}/internships/academic-years`
+          );
+          setAcademicYears(res.data); 
+          // [{ label: "2025-26", value: 2025 }, ...]
+        } catch (err) {
+          console.error("Failed to fetch academic years:", err);
+        }
+      };
+    
+      fetchAcademicYears();
+    }, []);
+    
+    useEffect(() => {
+      const fetchOrganizations = async () => {
+        try {
+          const res = await fetch(`${VITE_ORG_BASE_URL}`);
+          const data = await res.json();
+          console.log("Fetched organizations from API:", data); // ✅ This confirms fetch worked
+          setCompanies(data); // ✅ This sets the state
+        } catch (err) {
+          console.error("Failed to fetch organizations:", err);
+        }
+      };
+      fetchOrganizations();
+    }, []);
+    const [companies, setCompanies] = useState([]);
+
+
       const toggleFilters = () => {
         setShowFilters(!showFilters);
       };
+
+        const [currentPage, setCurrentPage] = useState(1);
       
       const convertDriveLink = (url) => {
         if (!url) return null;
         const match = url.match(/[-\w]{25,}/);
         return match ? `https://drive.google.com/file/d/${match[0]}/view` : url;
       };
-
       const buildQuery = () => {
-        const queryParams = Object.entries(filters)
-          .filter(([key, value]) => value)
-          .map(([key, value]) => {
-            let val = value;
-            if (key === "company") {
-              val = normalizeCompanyName(value.toLowerCase());
-            }
-            return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
-          });
-        return queryParams.join("&");
+        const params = new URLSearchParams();
+      
+        Object.entries(filters).forEach(([key, val]) => {
+          if (val !== "" && val !== null && val !== undefined) {
+            params.append(key, val);
+          }
+        });
+      
+        return params.toString();
       };
       
 
@@ -161,6 +203,13 @@
       useEffect(() => {
         fetchInternships();
       }, [filters]);
+
+      useEffect(() => {
+        setCurrentPage(1);
+      }, [filters]);
+      
+     
+      
 
       const handleChange = (e) => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -236,6 +285,10 @@
           </span>
         );
       };
+      const totalPages = Math.ceil(internships.length / ITEMS_PER_PAGE);
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const paginatedInternships = internships.slice(startIndex, endIndex);
 
       return (
         <div className="internship-page container-fluid ">
@@ -264,13 +317,20 @@
                   {/* Company */}
                   <div className="col-md-3">
                     <label className="form-label">Company</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="company"
-                      value={filters.company}
-                      onChange={handleChange}
-                    />
+                    <select
+                        className="form-select"
+                        name="company"
+                        value={filters.company}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Organization</option>
+                        {companies.map((org) => (
+                          <option key={org._id} value={org.name}>
+                            {org.name}
+                          </option>
+                        ))}
+                      </select>
+                    
                   </div>
 
                   {/* Status */}
@@ -328,18 +388,25 @@
 
                   {/* Start Year */}
                   <div className="col-md-3">
-                    <label className="form-label">Start Year</label>
-                    <select className="form-select" name="year" value={filters.year} onChange={handleChange}>
-                      <option value="">All Years</option>
-                      {[2023, 2024, 2025, 2026].map((yr) => (
-                        <option key={yr} value={yr}>{yr}</option>
+                    <label className="form-label">Academic Year</label>
+                    <select
+                      className="form-select"
+                      name="year"
+                      value={filters.year}
+                      onChange={handleChange}
+                    >
+                      <option value="">All Academic Years</option>
+                      {academicYears.map((yr) => (
+                        <option key={yr.value} value={yr.value}>
+                          {yr.label}
+                        </option>
                       ))}
                     </select>
                   </div>
 
                   {/* Start Month */}
                   <div className="col-md-3">
-                    <label className="form-label">Start Month</label>
+                    <label className="form-label">Month</label>
                     <select className="form-select" name="month" value={filters.month} onChange={handleChange}>
                       <option value="">All Months</option>
                       {[
@@ -351,43 +418,16 @@
                     </select>
                   </div>
 
-                  {/* End Month */}
-                  <div className="col-md-3">
-                    <label className="form-label">End Month</label>
-                    <select className="form-select" name="endMonth" value={filters.endMonth} onChange={handleChange}>
-                      <option value="">All Months</option>
-                      {[
-                        "January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December",
-                      ].map((m, i) => (
-                        <option key={i + 1} value={i + 1}>{m}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* End Year */}
-                  <div className="col-md-3">
-                    <label className="form-label">End Year</label>
-                    <select className="form-select" name="endYear" value={filters.endYear} onChange={handleChange}>
-                      <option value="">All Years</option>
-                      {[2023, 2024, 2025, 2026].map((yr) => (
-                        <option key={yr} value={yr}>{yr}</option>
-                      ))}
-                    </select>
-                  </div>
+                  
 
                   {/* Buttons */}
-                  <div className="col-md-3 d-flex align-items-end">
-                    <button className="btn btn-primary w-100" onClick={handleFilter}>
-                      Apply Filter
-                    </button>
-                  </div>
-
-                  <div className="col-md-3 d-flex align-items-end">
-                    <button className="btn btn-outline-secondary w-100" onClick={handleClear}>
-                      Clear Filters
-                    </button>
-                  </div>
+                  
+                  <div className="col-md-3">
+                        <label className="form-label invisible">Clear</label>
+                        <button className="btn btn-outline-secondary w-100" onClick={handleClear}>
+                          Clear Filters
+                        </button>
+                      </div>
                 </div>
               </div>
             </div>
@@ -417,7 +457,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {internships.map((i) => (
+                  {paginatedInternships.map((i) => (
+
                       <tr key={i._id}>
                         <td>{i.rollNo}</td>
                         <td>{normalizeCompanyName(i.organizationName.toLowerCase())}</td>
@@ -442,7 +483,7 @@
                             target="_blank"
                             rel="noreferrer"
                           >
-                            <span >📑</span> Application
+                            <span ></span> Application
                           </a>
                           )}{" "}
                           {i.offerLetter && (
@@ -455,10 +496,13 @@
                               target="_blank"
                               rel="noreferrer"
                             >
-                              📄 Offer
+                               Offer
                             </a>
+                            
                           )}{" "}
+                          <br />
                           {i.noc ? (
+                          
                             <a
                               href={
                                 i.noc.includes("drive.google.com")
@@ -468,7 +512,7 @@
                               target="_blank"
                               rel="noreferrer"
                             >
-                              📄 NOC
+                              NOC
                             </a>
                           ) : (
                             <span className="text-muted">NOC not uploaded</span>
@@ -493,6 +537,48 @@
               </div>
             </div>
           </div>
+          {totalPages > 1 && (
+  <div className="d-flex justify-content-center mt-4">
+    <ul className="pagination">
+
+      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+        <button
+          className="page-link"
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
+          Prev
+        </button>
+      </li>
+
+      {[...Array(totalPages)].map((_, index) => (
+        <li
+          key={index}
+          className={`page-item ${
+            currentPage === index + 1 ? "active" : ""
+          }`}
+        >
+          <button
+            className="page-link"
+            onClick={() => setCurrentPage(index + 1)}
+          >
+            {index + 1}
+          </button>
+        </li>
+      ))}
+
+      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+        <button
+          className="page-link"
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
+          Next
+        </button>
+      </li>
+
+    </ul>
+  </div>
+)}
+
           {showExportModal && (
       <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
         <div className="modal-dialog" role="document">
@@ -502,24 +588,34 @@
               <button type="button" className="btn-close" onClick={() => setShowExportModal(false)}></button>
             </div>
             <div className="modal-body">
-              {exportableFields.map((field) => (
-                <div className="form-check" key={field.key}>
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={selectedFields.includes(field.key)}
-                    onChange={() => {
-                      setSelectedFields((prev) =>
-                        prev.includes(field.key)
-                          ? prev.filter((key) => key !== field.key)
-                          : [...prev, field.key]
-                      );
-                    }}
-                  />
-                  <label className="form-check-label">{field.label}</label>
+                  {exportableFields.map((field) => (
+                    <div
+                      className="form-check d-flex align-items-center mb-2"
+                      key={field.key}
+                    >
+                      <input
+                        className="form-check-input me-2"
+                        type="checkbox"
+                        id={`export-${field.key}`}
+                        checked={selectedFields.includes(field.key)}
+                        onChange={() => {
+                          setSelectedFields((prev) =>
+                            prev.includes(field.key)
+                              ? prev.filter((key) => key !== field.key)
+                              : [...prev, field.key]
+                          );
+                        }}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor={`export-${field.key}`}
+                      >
+                        {field.label}
+                      </label>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+
             <div className="modal-footer">
               <button
                 className="btn btn-primary"

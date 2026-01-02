@@ -20,8 +20,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3131',  // local frontend
   'https://www.cseinterns.vjstartup.com', // deployed frontend
-  'https://hub.vjstartup.com',   
-  
+  'https://hub.vjstartup.com'
 ];
 
 app.use(cors({

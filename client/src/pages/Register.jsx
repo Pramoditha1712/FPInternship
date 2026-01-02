@@ -118,9 +118,6 @@ export default function Register() {
             </select>
             <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" required />
             <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} placeholder="Confirm Password" required />
-
-        
-
             <button type="submit" className="submit-btn gradient-button" disabled={loading}>
               {loading ? 'Registering...' : 'Sign up'}
             </button>

@@ -8,11 +8,13 @@ const Students = () => {
 
   const [students, setStudents] = useState([]);
   const [filters, setFilters] = useState({
-    name: "",
+    search: "",
     semester: "",
     branch: "",
     section: "",
+    academicYear: ""
   });
+  const [academicYears, setAcademicYears] = useState([]);
   
 
   const [showModal, setShowModal] = useState(false);
@@ -41,6 +43,14 @@ const Students = () => {
       console.error("Error fetching students:", error);
     }
   };
+  
+
+    useEffect(() => {
+      axios
+        .get(`${VITE_ADMIN_BASE_URL}/internships/academic-years`)
+        .then(res => setAcademicYears(res.data))
+        .catch(err => console.error(err));
+    }, []);
 
   useEffect(() => {
     fetchStudents();
@@ -100,6 +110,25 @@ const Students = () => {
       console.error("Failed to update student:", err);
     }
   };
+  const getPageNumbers = () => {
+    const maxVisible = 5; // max page buttons to show
+    const pages = [];
+  
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = start + maxVisible - 1;
+  
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - maxVisible + 1);
+    }
+  
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+  
+    return pages;
+  };
+  
 
   return (
     <div className="page-container">
@@ -108,20 +137,38 @@ const Students = () => {
 
       {/* FILTERS */}
       <div className="mb-4 row g-3 align-items-end">
+       
+
 
   {/* Student Name Search */}
   <div className="col-md-3">
     <label className="form-label">Student Name</label>
     <input
-      type="text"
-      className="form-control"
-      placeholder="Search by name"
-      name="name"
-      value={filters.name}
-      onChange={handleChange}
-    />
-  </div>
-
+          type="text"
+          className="form-control"
+          placeholder="Search by name / roll number"
+          name="search"
+          value={filters.search}
+          onChange={handleChange}
+        />
+    </div>
+ {/* Academic year Search */}
+ <div className="col-md-3">
+            <label className="form-label">Academic Year</label>
+            <select
+              className="form-select"
+              name="academicYear"
+              value={filters.academicYear}
+              onChange={handleChange}
+            >
+              <option value="">All Academic Years</option>
+              {academicYears.map(y => (
+                <option key={y.value} value={y.value}>
+                  {y.label}
+                </option>
+              ))}
+            </select>
+           </div> 
   {/* Semester */}
   <div className="col-md-2">
     <label className="form-label">Semester</label>
@@ -219,48 +266,79 @@ const Students = () => {
 
       {/* ========== PAGINATION UI (ADDED) ========== */}
       {totalPages > 1 && (
-        <div className="d-flex justify-content-center mt-4">
-          <ul className="pagination">
-            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-              <button
-                className="page-link"
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >
-                Prev
-              </button>
-            </li>
+  <div className="d-flex justify-content-center mt-4">
+    <ul className="pagination">
 
-            {[...Array(totalPages)].map((_, index) => (
-              <li
-                key={index}
-                className={`page-item ${
-                  currentPage === index + 1 ? "active" : ""
-                }`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => setCurrentPage(index + 1)}
-                >
-                  {index + 1}
-                </button>
-              </li>
-            ))}
+      {/* Prev */}
+      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+        <button
+          className="page-link"
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
+          Prev
+        </button>
+      </li>
 
-            <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
-            >
-              <button
-                className="page-link"
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >
-                Next
-              </button>
-            </li>
-          </ul>
-        </div>
+      {/* First page */}
+      {currentPage > 3 && (
+        <>
+          <li className="page-item">
+            <button className="page-link" onClick={() => setCurrentPage(1)}>
+              1
+            </button>
+          </li>
+          <li className="page-item disabled">
+            <span className="page-link">…</span>
+          </li>
+        </>
       )}
+
+      {/* Dynamic pages */}
+      {getPageNumbers().map((page) => (
+        <li
+          key={page}
+          className={`page-item ${currentPage === page ? "active" : ""}`}
+        >
+          <button
+            className="page-link"
+            onClick={() => setCurrentPage(page)}
+          >
+            {page}
+          </button>
+        </li>
+      ))}
+
+      {/* Last page */}
+      {currentPage < totalPages - 2 && (
+        <>
+          <li className="page-item disabled">
+            <span className="page-link">…</span>
+          </li>
+          <li className="page-item">
+            <button
+              className="page-link"
+              onClick={() => setCurrentPage(totalPages)}
+            >
+              {totalPages}
+            </button>
+          </li>
+        </>
+      )}
+
+      {/* Next */}
+      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+        <button
+          className="page-link"
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
+          Next
+        </button>
+      </li>
+
+    </ul>
+  </div>
+)}
+
       {/* ========================================= */}
 
       {/* ===== VIEW MODAL (UNCHANGED) ===== */}

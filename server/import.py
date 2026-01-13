@@ -120,10 +120,13 @@ hashed_password = bcrypt.hashpw(default_password.encode('utf-8'), bcrypt.gensalt
 # 👤 Prepare Users
 # =========================
 users_all = []
+seen_rolls = set()
 for _, row in df_users.iterrows():
-    roll = get_safe_value(row, "roll")
-    if not roll:
+    roll = str(get_safe_value(row, "roll")).strip().upper()
+    if roll in seen_rolls:
         continue
+    seen_rolls.add(roll)
+
     users_all.append({
         "rollNo": roll,
         "name": get_safe_value(row, "name"),

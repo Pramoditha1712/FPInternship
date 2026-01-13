@@ -102,6 +102,26 @@
       { key: "hrPhone", label: "HR Phone" },
     ];
 
+    const getPageNumbers = () => {
+      const maxVisible = 5; // how many page buttons to show
+      const pages = [];
+    
+      let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let end = start + maxVisible - 1;
+    
+      if (end > totalPages) {
+        end = totalPages;
+        start = Math.max(1, end - maxVisible + 1);
+      }
+    
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    
+      return pages;
+    };
+    
+
     useEffect(() => {
       const fetchAcademicYears = async () => {
         try {
@@ -541,6 +561,7 @@
   <div className="d-flex justify-content-center mt-4">
     <ul className="pagination">
 
+      {/* Prev */}
       <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
         <button
           className="page-link"
@@ -550,22 +571,53 @@
         </button>
       </li>
 
-      {[...Array(totalPages)].map((_, index) => (
+      {/* First */}
+      {currentPage > 3 && (
+        <>
+          <li className="page-item">
+            <button className="page-link" onClick={() => setCurrentPage(1)}>
+              1
+            </button>
+          </li>
+          <li className="page-item disabled">
+            <span className="page-link">…</span>
+          </li>
+        </>
+      )}
+
+      {/* Dynamic Pages */}
+      {getPageNumbers().map((page) => (
         <li
-          key={index}
-          className={`page-item ${
-            currentPage === index + 1 ? "active" : ""
-          }`}
+          key={page}
+          className={`page-item ${currentPage === page ? "active" : ""}`}
         >
           <button
             className="page-link"
-            onClick={() => setCurrentPage(index + 1)}
+            onClick={() => setCurrentPage(page)}
           >
-            {index + 1}
+            {page}
           </button>
         </li>
       ))}
 
+      {/* Last */}
+      {currentPage < totalPages - 2 && (
+        <>
+          <li className="page-item disabled">
+            <span className="page-link">…</span>
+          </li>
+          <li className="page-item">
+            <button
+              className="page-link"
+              onClick={() => setCurrentPage(totalPages)}
+            >
+              {totalPages}
+            </button>
+          </li>
+        </>
+      )}
+
+      {/* Next */}
       <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
         <button
           className="page-link"
@@ -578,6 +630,7 @@
     </ul>
   </div>
 )}
+
 
           {showExportModal && (
       <div className="modal d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>

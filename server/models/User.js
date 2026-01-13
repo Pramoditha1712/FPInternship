@@ -14,6 +14,7 @@ const UserSchema = new mongoose.Schema({
   // 🔒 Fields for password reset
   resetCode: { type: String, default: null },
   resetCodeExpiry: { type: Date, default: null },
+  resetAttempts: { type: Number, default: 0 }
 });
 
 // Hash password before saving

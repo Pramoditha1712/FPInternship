@@ -98,7 +98,13 @@ function Login_ad() {
               >
                 Login
               </button>
-
+              <p
+              className="text-end mt-2 text-primary"
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/admin-forgot-password")}
+            >
+              Forgot password?
+            </p>
           </form>
         </div>
       </div>

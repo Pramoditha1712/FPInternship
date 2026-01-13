@@ -22,7 +22,8 @@ import Landing from './pages/Landing';
 // import LoginGuest from './pages/Login_guest';
 import Organizations from './pages/Organizations';
 import GuestDashboard from './pages/GuestDashboard';
-import ForgotPassword from './pages/ForgotPassword';
+import ForgotPassword from './pages/ForgotPassword_student';
+import ForgotPassword_admin from './pages/ForgotPassword_admin'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -40,6 +41,8 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/apply" element={<InternshipForm />} />
         <Route path="/guest-dashboard" element={<GuestDashboard />} />
+        <Route path="/admin-forgot-password" element={<ForgotPassword_admin />} />
+
         <Route
           path="/admin"
           element={
@@ -49,6 +52,7 @@ const App = () => {
           }
         >
           <Route index element={<AdminDashboard />} />
+          
           <Route path="students" element={<Students />} />
           <Route path="internships" element={<Internships />} />
           <Route path="feedbacks" element={<Feedbacks />} />

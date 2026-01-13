@@ -121,7 +121,19 @@ router.post('/send-reset-code', async (req, res) => {
     await user.save();
 
     // 4️⃣ Send email
-    await sendMail(email, "Your password reset code", `Your verification code is ${code}`);
+    await sendMail(
+      email,
+      "Password Reset Code – CSE Internship Portal",
+      `Hello,
+    
+    Your password reset code is: ${code}
+    
+    This code expires in 10 minutes.
+    If you didn’t request this, ignore this email.
+    
+    – CSE Internship Portal`
+    );
+    
 
     console.log("✅ Reset code sent to:", email);
     res.json({ message: "Code sent to your email." });
@@ -134,37 +146,61 @@ router.post('/send-reset-code', async (req, res) => {
 
 
 // POST /auth/verify-reset-code
-router.post('/verify-reset-code', async (req, res) => {
+router.post("/verify-reset-code", async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
-    console.log("🧾 Received verify-reset-code body:", req.body);
-    console.log("🔑 New plain password:", newPassword);
-   
 
-
-
+    // 1️⃣ Validate input
     if (!email || !otp || !newPassword) {
-      return res.status(400).json({ error: "Missing email, otp, or new password." });
+      return res.status(400).json({
+        error: "Missing email, otp, or new password.",
+      });
     }
 
+    // 2️⃣ Find user
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ error: "User not found." });
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
 
+    // Initialize attempts
+    if (!user.resetAttempts) user.resetAttempts = 0;
+
+    // 3️⃣ Check expiry
+    if (!user.resetCode || Date.now() > user.resetCodeExpiry) {
+      return res.status(400).json({
+        error: "Code expired. Please request a new one.",
+      });
+    }
+
+    // 4️⃣ Check OTP
     if (String(user.resetCode) !== String(otp)) {
-      return res.status(400).json({ error: "Invalid verification code." });
+      user.resetAttempts += 1;
+      await user.save();
+
+      if (user.resetAttempts >= 5) {
+        user.resetCode = null;
+        user.resetCodeExpiry = null;
+        user.resetAttempts = 0;
+        await user.save();
+        return res.status(400).json({
+          error: "Too many attempts. Request a new code.",
+        });
+      }
+
+      return res.status(400).json({
+        error: "Invalid verification code.",
+      });
     }
 
-    if (Date.now() > user.resetCodeExpiry) {
-      return res.status(400).json({ error: "Code expired. Please request a new one." });
-    }
-
-    // ✅ Explicitly hash new password
+    // ✅ 5️⃣ SET PLAIN PASSWORD (AUTO-HASHED BY SCHEMA)
     user.password = newPassword;
 
-
-    // Clear reset fields
+    // 6️⃣ Clear reset fields
     user.resetCode = null;
     user.resetCodeExpiry = null;
+    user.resetAttempts = 0;
+
     await user.save();
 
     console.log("✅ Password reset successful for", email);
@@ -172,9 +208,12 @@ router.post('/verify-reset-code', async (req, res) => {
 
   } catch (err) {
     console.error("❌ verify-reset-code error:", err);
-    res.status(500).json({ error: "Server error while verifying reset code." });
+    res.status(500).json({
+      error: "Server error while verifying reset code.",
+    });
   }
 });
+
 
 
 

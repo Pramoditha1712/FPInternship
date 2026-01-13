@@ -5,8 +5,14 @@ const Internship = require('../models/Internship');
 const Feedback = require('../models/Feedback');
 const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
 const bcrypt = require('bcryptjs');
 const { normalizeCompanyName } = require('../service/helper');
+
+const sendMail = require("../utils/forgotpasswordEmailservice");
+
+console.log("✅ adminRoutes.js loaded");
+
 
 // Converts DB Date object into intended DD/MM interpretation
 
@@ -198,37 +204,59 @@ router.patch('/internships/:id/status', async (req, res) => {
   }
 });
 
-// Get Users with optional semester and section filters
+// Get x with optional semester and section filters
 router.get('/Users', async (req, res) => {
   try {
-    const { name, semester, branch, section } = req.query;
+    const { search, semester, branch, section, academicYear } = req.query;
 
-    const query = {};
-    if (name) {
-      query.name = { $regex: name, $options: "i" };
+    const userQuery = {};
+
+    /* ========= SEARCH ========= */
+    if (search) {
+      userQuery.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { rollNo: { $regex: search, $options: "i" } }
+      ];
     }
-    
-    if (semester) query.semester = semester;
+
+    if (semester) userQuery.semester = semester;
+    if (section) userQuery.section = section;
 
     const knownBranches = ["CSE", "CSBS"];
     if (branch) {
-      if (branch === "OTHER") {
-        query.branch = { $nin: knownBranches };
-      } else {
-        query.branch = branch;
+      userQuery.branch =
+        branch === "OTHER" ? { $nin: knownBranches } : branch;
+    }
+
+    /* ========= ACADEMIC YEAR FILTER ========= */
+    if (academicYear) {
+      const y = parseInt(academicYear, 10);
+
+      const start = new Date(y, 5, 1);       // June 1
+      const end   = new Date(y + 1, 4, 31);  // May 31
+
+      const internships = await Internship.find({
+        startingDate: { $gte: start, $lte: end }
+      }).select("rollNo");
+
+      const rollNos = [...new Set(internships.map(i => i.rollNo))];
+
+      if (rollNos.length === 0) {
+        return res.json([]); // no students
       }
+
+      userQuery.rollNo = { $in: rollNos };
     }
 
-    if (section) {
-      query.section = section;
-    }
-
-    const users = await User.find(query);
+    const users = await User.find(userQuery);
     res.json(users);
+
   } catch (err) {
+    console.error("Users fetch error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // Dashboard stats
@@ -526,18 +554,28 @@ router.post('/login', async (req, res) => {
   const { adminID, password } = req.body;
 
   try {
-    const admin = await Admin.findOne({ adminID, password });
+    const admin = await Admin.findOne({ adminID });
     if (!admin) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // For now, return a simple token (later use JWT)
-    res.json({ token: 'dummy-token-for-now', adminID: admin.adminID });
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // later replace with JWT
+    res.json({
+      token: 'dummy-token-for-now',
+      adminID: admin.adminID
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 
 
@@ -594,6 +632,81 @@ router.get('/remind-feedback', async (req, res) => {
     res.status(500).json({ error: 'Failed to send reminders.' });
   }
 });
+
+router.post("/send-otp", async (req, res) => {
+  try {
+    const { adminID } = req.body;
+ 
+
+    if (!adminID) {
+      return res.status(400).json({ error: "Admin ID is required" });
+    }
+
+    const admin = await Admin.findOne({ adminID });
+    if (!admin) {
+      return res.status(404).json({ error: "Admin not found" });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    admin.otp = {
+      code: otp,
+      expiresAt: Date.now() + 10 * 60 * 1000
+    };
+    await admin.save();
+
+    // ✅ EXPLICIT receiver
+    console.log("DEBUG EMAIL_USER:", process.env.EMAIL_USER);
+console.log("DEBUG EMAIL_PASS EXISTS:", !!process.env.EMAIL_PASS);
+
+await sendMail(
+  process.env.EMAIL_USER,
+  "Admin Password Reset OTP",
+  `Admin ID: ${adminID}\n\nYour OTP is ${otp}. Valid for 10 minutes.`
+);
+
+
+    res.json({ message: "OTP sent successfully" });
+
+  } catch (err) {
+    console.error("SEND OTP ERROR:", err);
+    res.status(500).json({ error: "Failed to send OTP" });
+  }
+});
+
+
+
+
+
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { adminID, otp, newPassword } = req.body;
+
+    const admin = await Admin.findOne({ adminID });
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+    if (!admin.otp || Date.now() > admin.otp.expiresAt) {
+      return res.status(400).json({ error: "OTP expired. Request again." });
+    }
+
+    if (admin.otp.code !== otp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    admin.password = newPassword; // auto-hashed
+    admin.otp = undefined;
+    await admin.save();
+
+    res.json({ message: "Admin password reset successful" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+
 
 
 
